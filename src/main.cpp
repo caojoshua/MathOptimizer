@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
     std::cout << "ignoring all arguments after the first" << std::endl;
   }
 
-  scan(argv[1]);
+  std::vector<Token> tokens = scan(argv[1]);
 
   return 0;
 }
