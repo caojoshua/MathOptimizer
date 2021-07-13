@@ -1,3 +1,5 @@
 add_executable(mathparser
   main.cpp
-  Scanner.cpp)
+  Node.cpp
+  Scanner.cpp
+  TopDownParser.cpp)

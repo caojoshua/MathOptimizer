@@ -1,4 +1,5 @@
 #include "Scanner.h"
+#include "TopDownParser.h"
 #include <iostream>
 
 int main(int argc, char *argv[]) {
@@ -9,7 +10,9 @@ int main(int argc, char *argv[]) {
     std::cout << "ignoring all arguments after the first" << std::endl;
   }
 
-  std::vector<Token> tokens = scan(argv[1]);
+  std::list<Token> tokens = scan(argv[1]);
+
+  Node * topDownOutput = TopDownParser::parse(tokens);
 
   return 0;
 }

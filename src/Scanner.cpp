@@ -1,16 +1,24 @@
 #include "Scanner.h"
 #include <iostream>
 
+Token::Kind Token::getKind() {
+  return this->kind;
+}
+
 float Token::getNumber() {
-  return number;
+  return this->number;
 }
 
 std::string Token::getIdentifier() {
-  return identifier;
+  return this->identifier;
 }
 
-std::vector<Token> scan(char *in) {
-  std::vector<Token> tokens = std::vector<Token>();
+bool Token::isKind(Kind kind) {
+  return this->kind == kind;
+}
+
+std::list<Token> scan(char *in) {
+  std::list<Token> tokens = std::list<Token>();
 
   while (*in) {
     char c = *in;

@@ -1,8 +1,8 @@
 #ifndef SCANNER_H
 #define SCANNER_H
 
+#include <list>
 #include <string>
-#include <vector>
 
 class Token {
   public:
@@ -20,8 +20,10 @@ class Token {
     Token(Kind kind) : kind(kind) {};
     Token(Kind kind, float number) : kind(kind), number(number) {};
     Token(Kind kind, std::string identifier) : kind(kind), identifier(identifier) {};
+    Kind getKind();
     float getNumber();
     std::string getIdentifier();
+    bool isKind(Kind kind);
 
   private:
     Kind kind;
@@ -29,6 +31,6 @@ class Token {
     std::string identifier;
 };
 
-std::vector<Token> scan(char *in);
+std::list<Token> scan(char *in);
 
 #endif
