@@ -14,5 +14,7 @@ int main(int argc, char *argv[]) {
 
   Node * topDownOutput = TopDownParser::parse(tokens);
 
+  std::cout << topDownOutput->codeGen() << std::endl;
+
   return 0;
 }

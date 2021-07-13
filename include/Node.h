@@ -1,11 +1,12 @@
 #ifndef NODE_H
 #define NODE_H
 
+#include <sstream>
 #include <string>
 
 class Node {
-  // TODO: implement toString for each node
-  // virtual void toString() = 0;
+  public:
+    virtual std::string codeGen() = 0;
 };
 
 class BinaryOpNode : public Node {
@@ -18,6 +19,7 @@ class BinaryOpNode : public Node {
     };
 
     BinaryOpNode(Op op, Node *left, Node *right) : op(op), left(left), right(right) {};
+    std::string codeGen();
     Op getOp();
     Node *getLeft();
     Node *getRight();
@@ -31,6 +33,7 @@ class BinaryOpNode : public Node {
 class IdentifierNode : public Node {
   public:
     IdentifierNode(std::string identifier) : identifier(identifier) {}
+    std::string codeGen();
     std::string getIdentifier();
 
   private:
@@ -40,9 +43,11 @@ class IdentifierNode : public Node {
 class NumberNode : public Node {
   public:
     NumberNode(float number) : number(number) {}
+    std::string codeGen();
     float getNumber();
 
   private:
+    static std::ostringstream ss;
     float number;
 };
 
