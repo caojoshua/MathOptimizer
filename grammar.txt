@@ -1,4 +1,13 @@
+E = Expression
+T = Term
+F = Factor
+N = Negated Value
+V = Value
+num = number (terminal)
+id = identifier (terminal)
+
 E   ->  T + E | T - E | T
 T   ->  F * T | F / T | F
-F   ->  (E) | V
+F   ->  (E) | N
+N   ->  - V | V
 V   ->  num | id
