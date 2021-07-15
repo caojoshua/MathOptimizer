@@ -44,6 +44,18 @@ std::string BinaryOpNode::toString() {
   return opToStr();
 }
 
+void BinaryOpNode::setOp(Op op) {
+  this->op = op;
+}
+
+void BinaryOpNode::setLeft(Node *left) {
+  this->left = left;
+}
+
+void BinaryOpNode::setRight(Node *right) {
+  this->right = right;
+}
+
 BinaryOpNode::Op BinaryOpNode::getOp() {
   return this->op;
 }
@@ -99,7 +111,11 @@ unsigned BinaryOpNode::getOpPrecedence() {
 }
 
 void BinaryOpNode::unknownOperatorError() {
-  std::cerr << "BinaryOpNode has unknown operator '" << this->op << "'" << std::endl;
+  BinaryOpNode::unknownOperatorError(this->op);
+}
+
+void BinaryOpNode::unknownOperatorError(Op op) {
+  std::cerr << "BinaryOpNode has unknown operator '" << op << "'" << std::endl;
   exit(1);
 }
 

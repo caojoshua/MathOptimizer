@@ -1,3 +1,4 @@
+#include "Optimizer.h"
 #include "Scanner.h"
 #include "TopDownParser.h"
 #include <iostream>
@@ -13,6 +14,8 @@ int main(int argc, char *argv[]) {
   std::list<Token> tokens = scan(argv[1]);
 
   Node * topDownOutput = TopDownParser::parse(tokens);
+
+  topDownOutput = optimize(topDownOutput);
 
   std::cout << topDownOutput->codeGen() << std::endl;
 

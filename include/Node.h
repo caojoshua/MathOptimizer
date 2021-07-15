@@ -22,6 +22,9 @@ class BinaryOpNode : public Node {
     BinaryOpNode(Op op, Node *left, Node *right) : op(op), left(left), right(right) {};
     std::string codeGen();
     std::string toString();
+    void setOp(Op op);
+    void setLeft(Node *left);
+    void setRight(Node *right);
     Op getOp();
     Node *getLeft();
     Node *getRight();
@@ -29,6 +32,8 @@ class BinaryOpNode : public Node {
     bool samePrecedence(BinaryOpNode *other);
     unsigned getOpPrecedence();
     void unknownOperatorError();
+
+    static void unknownOperatorError(Op op);
 
   private:
     Op op;
