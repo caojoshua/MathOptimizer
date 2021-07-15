@@ -63,10 +63,12 @@ void BinaryOpNode::setOp(Op op) {
 
 void BinaryOpNode::setLeft(Node *left) {
   this->left = left;
+  left->setParent(this);
 }
 
 void BinaryOpNode::setRight(Node *right) {
   this->right = right;
+  right->setParent(this);
 }
 
 BinaryOpNode::Op BinaryOpNode::getOp() {

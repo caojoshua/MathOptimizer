@@ -22,10 +22,8 @@ Node * optimize(Node *n) {
     delete binaryOpNode;
     return collapseNumberNodes(op, leftNumberNode, rightNumberNode);
   } else if (leftNumberNode && rightBinaryOpNode && collapseBinaryOpAndNumberNode(op, rightBinaryOpNode, leftNumberNode, true)) {
-    delete left;
     return right;
   } else if (rightNumberNode && leftBinaryOpNode && collapseBinaryOpAndNumberNode(op, leftBinaryOpNode, rightNumberNode, false)) {
-    delete right;
     return left;
   }
 
@@ -133,11 +131,13 @@ bool collapseBinaryOpAndNumberNode(BinaryOpNode::Op op, BinaryOpNode *binaryOpNo
 
   NumberNode *newNumberNode;
   if (isNumberNodeLeft) {
-    newNumberNode = collapseNumberNodes(binaryOpNode->getOp(), numberNode, collapsableNumberNode);
+    newNumberNode = collapseNumberNodes(op, numberNode, collapsableNumberNode);
   } else {
-    newNumberNode = collapseNumberNodes(binaryOpNode->getOp(), collapsableNumberNode, numberNode);
+    newNumberNode = collapseNumberNodes(op, collapsableNumberNode, numberNode);
   }
 
   replaceChild(collapsableNumberNode, newNumberNode);
+  delete numberNode;
+  delete collapsableNumberNode;
   return true;
 }
