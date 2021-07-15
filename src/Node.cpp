@@ -2,11 +2,11 @@
 #include <iostream>
 #include <sstream>
 
-Node *Node::getParent() {
+BinaryOpNode *Node::getParent() {
   return this->parent;
 }
 
-void Node::setParent(Node *parent) {
+void Node::setParent(BinaryOpNode *parent) {
   this->parent = parent;
 }
 
@@ -110,7 +110,15 @@ bool BinaryOpNode::samePrecedence(BinaryOpNode *other) {
 }
 
 unsigned BinaryOpNode::getOpPrecedence() {
-  switch (this->op) {
+  return BinaryOpNode::getOpPrecedence(this->op);
+}
+
+void BinaryOpNode::unknownOperatorError() {
+  BinaryOpNode::unknownOperatorError(this->op);
+}
+
+unsigned BinaryOpNode::getOpPrecedence(Op op) {
+  switch (op) {
     case Add:
     case Sub:
       return 0;
@@ -118,13 +126,9 @@ unsigned BinaryOpNode::getOpPrecedence() {
     case Div:
       return 1;
     default:
-      unknownOperatorError();
+      BinaryOpNode::unknownOperatorError(op);
   }
   return 0;
-}
-
-void BinaryOpNode::unknownOperatorError() {
-  BinaryOpNode::unknownOperatorError(this->op);
 }
 
 void BinaryOpNode::unknownOperatorError(Op op) {

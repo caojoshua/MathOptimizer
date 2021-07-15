@@ -4,16 +4,19 @@
 #include <sstream>
 #include <string>
 
+class BinaryOpNode;
+
 class Node {
   public:
     Node() : parent(nullptr) {};
-    Node *getParent();
-    void setParent(Node *parent);
+    virtual ~Node() {};
+    BinaryOpNode *getParent();
+    void setParent(BinaryOpNode *parent);
     virtual std::string codeGen() = 0;
     virtual std::string toString() = 0;
 
   private:
-    Node *parent;
+    BinaryOpNode*parent;
 
 };
 
@@ -40,6 +43,7 @@ class BinaryOpNode : public Node {
     unsigned getOpPrecedence();
     void unknownOperatorError();
 
+    static unsigned getOpPrecedence(Op op);
     static void unknownOperatorError(Op op);
 
   private:
