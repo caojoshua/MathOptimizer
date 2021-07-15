@@ -1,13 +1,15 @@
 E = Expression
 T = Term
 F = Factor
-N = Negated Value
 V = Value
+N = Negated Value
+D = Decimal
 num = number (terminal)
 id = identifier (terminal)
 
 E   ->  T + E | T - E | T
 T   ->  F * T | F / T | F
-F   ->  (E) | N
-N   ->  - V | V
-V   ->  num | id
+F   ->  (E) | V
+V   ->  N | id
+N   ->  - D | D
+D   ->  num.num | num
