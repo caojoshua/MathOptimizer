@@ -2,6 +2,19 @@
 #include <iostream>
 #include <sstream>
 
+Node *Node::getParent() {
+  return this->parent;
+}
+
+void Node::setParent(Node *parent) {
+  this->parent = parent;
+}
+
+BinaryOpNode::BinaryOpNode(Op op, Node *left, Node *right) : Node(), op(op), left(left), right(right) {
+  left->setParent(this);
+  right->setParent(this);
+}
+
 std::string BinaryOpNode::codeGen() {
   std::string op = "";
   switch (this->op) {
