@@ -10,5 +10,6 @@ void replaceChild(Node *oldChild, Node *newChild);
 void deleteNode(Node *child);
 NumberNode *foldNumberNodes(BinaryOpNode::Op op, NumberNode *left, NumberNode *right);
 bool foldBinaryOpAndNumberNode(BinaryOpNode::Op op, BinaryOpNode *binaryOpNode, NumberNode *numberNode, bool isNumberNodeLeft);
+bool foldBinaryOpNodes(BinaryOpNode::Op op, BinaryOpNode *left, BinaryOpNode *right);
 
 #endif

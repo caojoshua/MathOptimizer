@@ -19,6 +19,9 @@ Node *foldConstants(BinaryOpNode *n) {
   Node *left = optimize(n->getLeft());
   Node *right = optimize(n->getRight());
 
+  n->setLeft(left);
+  n->setRight(right);
+
   NumberNode *leftNumberNode = dynamic_cast<NumberNode *>(left);
   NumberNode *rightNumberNode = dynamic_cast<NumberNode *>(right);
   BinaryOpNode *leftBinaryOpNode = dynamic_cast<BinaryOpNode *>(left);
@@ -32,9 +35,9 @@ Node *foldConstants(BinaryOpNode *n) {
   } else if (rightNumberNode && leftBinaryOpNode && foldBinaryOpAndNumberNode(op, leftBinaryOpNode, rightNumberNode, false)) {
     return left;
   }
-
-  n->setLeft(left);
-  n->setRight(right);
+  else if (leftBinaryOpNode && rightBinaryOpNode && foldBinaryOpNodes(op, leftBinaryOpNode, rightBinaryOpNode)) {
+    return n;
+  }
 
   return n;
 }
@@ -92,11 +95,9 @@ void deleteNode(Node *n) {
 
   if (parent->getLeft() == n) {
     replaceChild(parent, parent->getRight());
-    parent->setRight(nullptr);
     delete parent;
   } else if (parent->getRight() == n) {
     replaceChild(parent, parent->getLeft());
-    parent->setLeft(nullptr);
     delete parent;
   }
 }
@@ -126,11 +127,7 @@ NumberNode *foldNumberNodes(BinaryOpNode::Op op, NumberNode *left, NumberNode *r
 }
 
 bool foldBinaryOpAndNumberNode(BinaryOpNode::Op op, BinaryOpNode *binaryOpNode, NumberNode *numberNode, bool isNumberNodeLeft) {
-  Node *left = binaryOpNode->getLeft();
-  Node *right = binaryOpNode->getRight();
-
   NumberNode *foldableNumberNode = findNearestCommutativeNumberNode(BinaryOpNode::getOpPrecedence(op), binaryOpNode);
-
   if (!foldableNumberNode) {
     return false;
   }
@@ -145,5 +142,23 @@ bool foldBinaryOpAndNumberNode(BinaryOpNode::Op op, BinaryOpNode *binaryOpNode, 
   replaceChild(foldableNumberNode, newNumberNode);
   delete numberNode;
   delete foldableNumberNode;
+  return true;
+}
+
+bool foldBinaryOpNodes(BinaryOpNode::Op op, BinaryOpNode *left, BinaryOpNode *right) {
+  unsigned opPrecedence = BinaryOpNode::getOpPrecedence(op);
+
+  NumberNode *leftFoldableNumberNode = findNearestCommutativeNumberNode(op, left);
+  NumberNode *rightFoldableNumberNode = findNearestCommutativeNumberNode(op, right);
+
+  if (!leftFoldableNumberNode && !rightFoldableNumberNode) {
+    return false;
+  }
+
+  NumberNode *newNumberNode = foldNumberNodes(op, leftFoldableNumberNode, rightFoldableNumberNode);
+
+  replaceChild(leftFoldableNumberNode, newNumberNode);
+  deleteNode(rightFoldableNumberNode);
+  delete leftFoldableNumberNode;
   return true;
 }
