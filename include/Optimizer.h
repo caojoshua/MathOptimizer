@@ -4,6 +4,7 @@
 #include "Node.h"
 
 Node *optimize(Node *n);
+Node *foldConstants(BinaryOpNode *n);
 NumberNode *findNearestCommutativeNumberNode(unsigned precedence, Node *n);
 void replaceChild(Node *oldChild, Node *newChild);
 void deleteNode(Node *child);

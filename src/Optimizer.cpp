@@ -2,16 +2,22 @@
 #include "Node.h"
 #include <iostream>
 
-Node * optimize(Node *n) {
+Node *optimize(Node *n) {
   BinaryOpNode *binaryOpNode = dynamic_cast<BinaryOpNode *>(n);
   if (!binaryOpNode) {
     return n;
   }
 
-  BinaryOpNode::Op op = binaryOpNode->getOp();
+  binaryOpNode = dynamic_cast<BinaryOpNode *>(foldConstants(binaryOpNode));
 
-  Node *left = optimize(binaryOpNode->getLeft());
-  Node *right = optimize(binaryOpNode->getRight());
+  return binaryOpNode;
+}
+
+Node *foldConstants(BinaryOpNode *n) {
+  BinaryOpNode::Op op = n->getOp();
+
+  Node *left = optimize(n->getLeft());
+  Node *right = optimize(n->getRight());
 
   NumberNode *leftNumberNode = dynamic_cast<NumberNode *>(left);
   NumberNode *rightNumberNode = dynamic_cast<NumberNode *>(right);
@@ -19,7 +25,7 @@ Node * optimize(Node *n) {
   BinaryOpNode *rightBinaryOpNode = dynamic_cast<BinaryOpNode *>(right);
 
   if (leftNumberNode && rightNumberNode) {
-    delete binaryOpNode;
+    delete n;
     return foldNumberNodes(op, leftNumberNode, rightNumberNode);
   } else if (leftNumberNode && rightBinaryOpNode && foldBinaryOpAndNumberNode(op, rightBinaryOpNode, leftNumberNode, true)) {
     return right;
@@ -27,8 +33,8 @@ Node * optimize(Node *n) {
     return left;
   }
 
-  binaryOpNode->setLeft(left);
-  binaryOpNode->setRight(right);
+  n->setLeft(left);
+  n->setRight(right);
 
   return n;
 }
