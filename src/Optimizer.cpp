@@ -20,10 +20,10 @@ Node * optimize(Node *n) {
 
   if (leftNumberNode && rightNumberNode) {
     delete binaryOpNode;
-    return collapseNumberNodes(op, leftNumberNode, rightNumberNode);
-  } else if (leftNumberNode && rightBinaryOpNode && collapseBinaryOpAndNumberNode(op, rightBinaryOpNode, leftNumberNode, true)) {
+    return foldNumberNodes(op, leftNumberNode, rightNumberNode);
+  } else if (leftNumberNode && rightBinaryOpNode && foldBinaryOpAndNumberNode(op, rightBinaryOpNode, leftNumberNode, true)) {
     return right;
-  } else if (rightNumberNode && leftBinaryOpNode && collapseBinaryOpAndNumberNode(op, leftBinaryOpNode, rightNumberNode, false)) {
+  } else if (rightNumberNode && leftBinaryOpNode && foldBinaryOpAndNumberNode(op, leftBinaryOpNode, rightNumberNode, false)) {
     return left;
   }
 
@@ -95,7 +95,7 @@ void deleteNode(Node *n) {
   }
 }
 
-NumberNode *collapseNumberNodes(BinaryOpNode::Op op, NumberNode *left, NumberNode *right) {
+NumberNode *foldNumberNodes(BinaryOpNode::Op op, NumberNode *left, NumberNode *right) {
   float number = 0;
   float leftNumber = left->getNumber();
   float rightNumber = right->getNumber();
@@ -119,25 +119,25 @@ NumberNode *collapseNumberNodes(BinaryOpNode::Op op, NumberNode *left, NumberNod
   return new NumberNode(number);
 }
 
-bool collapseBinaryOpAndNumberNode(BinaryOpNode::Op op, BinaryOpNode *binaryOpNode, NumberNode *numberNode, bool isNumberNodeLeft) {
+bool foldBinaryOpAndNumberNode(BinaryOpNode::Op op, BinaryOpNode *binaryOpNode, NumberNode *numberNode, bool isNumberNodeLeft) {
   Node *left = binaryOpNode->getLeft();
   Node *right = binaryOpNode->getRight();
 
-  NumberNode *collapsableNumberNode = findNearestCommutativeNumberNode(BinaryOpNode::getOpPrecedence(op), binaryOpNode);
+  NumberNode *foldableNumberNode = findNearestCommutativeNumberNode(BinaryOpNode::getOpPrecedence(op), binaryOpNode);
 
-  if (!collapsableNumberNode) {
+  if (!foldableNumberNode) {
     return false;
   }
 
   NumberNode *newNumberNode;
   if (isNumberNodeLeft) {
-    newNumberNode = collapseNumberNodes(op, numberNode, collapsableNumberNode);
+    newNumberNode = foldNumberNodes(op, numberNode, foldableNumberNode);
   } else {
-    newNumberNode = collapseNumberNodes(op, collapsableNumberNode, numberNode);
+    newNumberNode = foldNumberNodes(op, foldableNumberNode, numberNode);
   }
 
-  replaceChild(collapsableNumberNode, newNumberNode);
+  replaceChild(foldableNumberNode, newNumberNode);
   delete numberNode;
-  delete collapsableNumberNode;
+  delete foldableNumberNode;
   return true;
 }
