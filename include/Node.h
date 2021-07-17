@@ -45,7 +45,8 @@ class OperatorNode : public Node {
     std::string toString();
 
     Precedence getPrecedence();
-    std::list<Parameter> getParameters();
+    std::list<Parameter> &getParameters();
+    void appendParameter(Node *node);
     bool appendParameter(Op op, Node *node);
 
     static unsigned getOpPrecedence(Op op);

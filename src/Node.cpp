@@ -11,13 +11,7 @@ void Node::setParent(OperatorNode *parent) {
 }
 
 OperatorNode::OperatorNode(Precedence precedence, Node *node) : precedence(precedence) {
-  switch (precedence) {
-    case SumPrecedence:
-      parameters.push_back(Parameter{Add, node});
-      break;
-    case ProductPrecedence:
-      parameters.push_back(Parameter{Mul, node});
-  }
+  this->appendParameter(node);
 }
 
 std::string OperatorNode::codeGen() {
@@ -50,8 +44,21 @@ OperatorNode::Precedence OperatorNode::getPrecedence() {
   return this->precedence;
 }
 
-std::list<OperatorNode::Parameter> OperatorNode::getParameters() {
+std::list<OperatorNode::Parameter> &OperatorNode::getParameters() {
   return parameters;
+}
+
+void OperatorNode::appendParameter(Node *node) {
+  Op op;
+  switch (this->precedence) {
+    case SumPrecedence:
+      op = Add;
+      break;
+    case ProductPrecedence:
+      op = Mul;
+      break;
+  }
+  parameters.push_back(Parameter{op, node});
 }
 
 bool OperatorNode::appendParameter(Op op, Node *node) {
