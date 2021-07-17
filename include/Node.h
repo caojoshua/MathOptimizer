@@ -1,26 +1,26 @@
 #ifndef NODE_H
 #define NODE_H
 
+#include <list>
 #include <sstream>
 #include <string>
 
-class BinaryOpNode;
+class OperatorNode;
 
 class Node {
   public:
     Node() : parent(nullptr) {};
     virtual ~Node() {};
-    BinaryOpNode *getParent();
-    void setParent(BinaryOpNode *parent);
+    OperatorNode *getParent();
+    void setParent(OperatorNode *parent);
     virtual std::string codeGen() = 0;
     virtual std::string toString() = 0;
 
   private:
-    BinaryOpNode*parent;
-
+    OperatorNode *parent;
 };
 
-class BinaryOpNode : public Node {
+class OperatorNode : public Node {
   public:
     enum Op {
       Add,
@@ -29,27 +29,32 @@ class BinaryOpNode : public Node {
       Div
     };
 
-    BinaryOpNode(Op op, Node *left, Node *right);
+    enum Precedence {
+      SumPrecedence = 0,
+      ProductPrecedence = 1
+    };
+
+    struct Parameter {
+      Op op;
+      Node *node;
+    };
+
+    OperatorNode(Precedence precedence, Node *node);
+
     std::string codeGen();
     std::string toString();
-    void setOp(Op op);
-    void setLeft(Node *left);
-    void setRight(Node *right);
-    Op getOp();
-    Node *getLeft();
-    Node *getRight();
-    bool higherPrecedence(BinaryOpNode *other);
-    bool samePrecedence(BinaryOpNode *other);
-    unsigned getOpPrecedence();
-    void unknownOperatorError();
+
+    Precedence getPrecedence();
+    std::list<Parameter> getParameters();
+    bool appendParameter(Op op, Node *node);
 
     static unsigned getOpPrecedence(Op op);
+    static std::string opToStr(Op op);
     static void unknownOperatorError(Op op);
 
   private:
-    Op op;
-    Node *left;
-    Node *right;
+    Precedence precedence;
+    std::list<Parameter> parameters; 
 
     std::string opToStr();
 };

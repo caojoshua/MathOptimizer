@@ -12,38 +12,46 @@ Node * TopDownParser::parse(Tokens &tokens) {
 Node * TopDownParser::parseExpression(Tokens &tokens) {
   Node *n = parseTerm(tokens);
 
+  if (!isNextTokenKind(tokens, Token::Add) && !isNextTokenKind(tokens, Token::Sub)) {
+    return n;
+  }
+
+  OperatorNode *operatorNode = new OperatorNode(OperatorNode::SumPrecedence, n);
   while (true) {
     if (isNextTokenKind(tokens, Token::Add)) {
       parseToken(tokens);
-      n = new BinaryOpNode(BinaryOpNode::Add, n, parseTerm(tokens));
+      operatorNode->appendParameter(OperatorNode::Add, parseFactor(tokens));
     } else if (isNextTokenKind(tokens, Token::Sub)) {
       parseToken(tokens);
-      n = new BinaryOpNode(BinaryOpNode::Sub, n, parseTerm(tokens));
+      operatorNode->appendParameter(OperatorNode::Sub, parseFactor(tokens));
     } else {
       break;
     }
   }
 
-  return n;
+  return operatorNode;
 }
 
 Node * TopDownParser::parseTerm(Tokens &tokens) {
   Node *n = parseFactor(tokens);
+  if (!isNextTokenKind(tokens, Token::Mul) && !isNextTokenKind(tokens, Token::Div)) {
+    return n;
+  }
 
+  OperatorNode *operatorNode = new OperatorNode(OperatorNode::ProductPrecedence, n);
   while (true) {
     if (isNextTokenKind(tokens, Token::Mul)) {
       parseToken(tokens);
-      n = new BinaryOpNode(BinaryOpNode::Mul, n, parseFactor(tokens));
+      operatorNode->appendParameter(OperatorNode::Mul, parseFactor(tokens));
     } else if (isNextTokenKind(tokens, Token::Div)) {
       parseToken(tokens);
-      n = new BinaryOpNode(BinaryOpNode::Div, n, parseFactor(tokens));
-    }
-    else {
+      operatorNode->appendParameter(OperatorNode::Div, parseFactor(tokens));
+    } else {
       break;
     }
   }
 
-  return n;
+  return operatorNode;
 }
 
 Node * TopDownParser::parseFactor(Tokens &tokens) {

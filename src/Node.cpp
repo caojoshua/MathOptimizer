@@ -2,89 +2,82 @@
 #include <iostream>
 #include <sstream>
 
-BinaryOpNode *Node::getParent() {
+OperatorNode *Node::getParent() {
   return this->parent;
 }
 
-void Node::setParent(BinaryOpNode *parent) {
+void Node::setParent(OperatorNode *parent) {
   this->parent = parent;
 }
 
-BinaryOpNode::BinaryOpNode(Op op, Node *left, Node *right) : Node(), op(op), left(left), right(right) {
-  left->setParent(this);
-  right->setParent(this);
+OperatorNode::OperatorNode(Precedence precedence, Node *node) : precedence(precedence) {
+  switch (precedence) {
+    case SumPrecedence:
+      parameters.push_back(Parameter{Add, node});
+      break;
+    case ProductPrecedence:
+      parameters.push_back(Parameter{Mul, node});
+  }
 }
 
-std::string BinaryOpNode::codeGen() {
-  std::string op = "";
-  switch (this->op) {
+std::string OperatorNode::codeGen() {
+  if (parameters.size() == 0) {
+    return "";
+  }
+
+  auto iter = parameters.cbegin();
+  std::string s = iter->node->codeGen();
+  ++iter;
+
+  while (iter != parameters.cend()) {
+    std::string nodeStr = iter->node->codeGen();
+    OperatorNode *childOperatorNode = dynamic_cast<OperatorNode *>(iter->node);
+    if (childOperatorNode) {
+      nodeStr = '(' + nodeStr + ')';
+    }
+    s += ' ' + opToStr(iter->op) + ' ' + nodeStr;
+    ++iter;
+  }
+
+  return s;
+}
+
+std::string OperatorNode::toString() {
+  return "not implemented yet";
+}
+
+OperatorNode::Precedence OperatorNode::getPrecedence() {
+  return this->precedence;
+}
+
+std::list<OperatorNode::Parameter> OperatorNode::getParameters() {
+  return parameters;
+}
+
+bool OperatorNode::appendParameter(Op op, Node *node) {
+  if (this->precedence != getOpPrecedence(op)) {
+    return false;
+  }
+  parameters.push_back(Parameter{op, node});
+  return true;
+}
+
+unsigned OperatorNode::getOpPrecedence(Op op) {
+  switch (op) {
     case Add:
-      op = "+";
-      break;
     case Sub:
-      op = "-";
-      break;
+      return 0;
     case Mul:
-      op = "*";
-      break;
     case Div:
-      op = "/";
-      break;
+      return 1;
     default:
-      std::cerr << "BinaryOpNode has unknown operator " << op << std::endl;
-      exit(1);
+      OperatorNode::unknownOperatorError(op);
   }
-
-  std::string leftString = left->codeGen();
-  std::string rightString = right->codeGen();
-
-  BinaryOpNode *leftBinaryOpNode = dynamic_cast<BinaryOpNode *>(left);
-  BinaryOpNode *rightBinaryOpNode = dynamic_cast<BinaryOpNode *>(right);
-
-  if (leftBinaryOpNode && this->getOpPrecedence() > leftBinaryOpNode->getOpPrecedence()) {
-    leftString = '(' + leftString + ')';
-  }
-
-  if (rightBinaryOpNode && this->getOpPrecedence() > rightBinaryOpNode->getOpPrecedence()) {
-    rightString = '(' + rightString + ')';
-  }
-
-  return leftString + ' ' + op + ' ' + rightString;
+  return 0;
 }
 
-std::string BinaryOpNode::toString() {
-  // TODO: concisely print left and right nodes
-  return opToStr();
-}
-
-void BinaryOpNode::setOp(Op op) {
-  this->op = op;
-}
-
-void BinaryOpNode::setLeft(Node *left) {
-  this->left = left;
-  left->setParent(this);
-}
-
-void BinaryOpNode::setRight(Node *right) {
-  this->right = right;
-  right->setParent(this);
-}
-
-BinaryOpNode::Op BinaryOpNode::getOp() {
-  return this->op;
-}
-
-Node * BinaryOpNode::getLeft() {
-  return this->left;
-}
-
-Node * BinaryOpNode::getRight() {
-  return this->right;
-}
-
-std::string BinaryOpNode::opToStr() {
-  switch (this->op) {
+std::string OperatorNode::opToStr(Op op) {
+  switch (op) {
     case Add:
       return "+";
       break;
@@ -98,43 +91,13 @@ std::string BinaryOpNode::opToStr() {
       return "/";
       break;
     default:
-      unknownOperatorError();
+      unknownOperatorError(op);
   }
   return "";
 }
 
-bool BinaryOpNode::higherPrecedence(BinaryOpNode *other) {
-  return getOpPrecedence() > other->getOpPrecedence();
-}
-
-bool BinaryOpNode::samePrecedence(BinaryOpNode *other) {
-  return getOpPrecedence() == other->getOpPrecedence();
-}
-
-unsigned BinaryOpNode::getOpPrecedence() {
-  return BinaryOpNode::getOpPrecedence(this->op);
-}
-
-void BinaryOpNode::unknownOperatorError() {
-  BinaryOpNode::unknownOperatorError(this->op);
-}
-
-unsigned BinaryOpNode::getOpPrecedence(Op op) {
-  switch (op) {
-    case Add:
-    case Sub:
-      return 0;
-    case Mul:
-    case Div:
-      return 1;
-    default:
-      BinaryOpNode::unknownOperatorError(op);
-  }
-  return 0;
-}
-
-void BinaryOpNode::unknownOperatorError(Op op) {
-  std::cerr << "BinaryOpNode has unknown operator '" << op << "'" << std::endl;
+void OperatorNode::unknownOperatorError(Op op) {
+  std::cerr << "OperatorNode has unknown operator '" << op << "'" << std::endl;
   exit(1);
 }
 
