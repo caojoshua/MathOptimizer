@@ -20,10 +20,10 @@ Node * TopDownParser::parseExpression(Tokens &tokens) {
   while (true) {
     if (isNextTokenKind(tokens, Token::Add)) {
       parseToken(tokens);
-      operatorNode->appendParameter(OperatorNode::Add, parseFactor(tokens));
+      operatorNode->appendParameter(OperatorNode::Add, parseTerm(tokens));
     } else if (isNextTokenKind(tokens, Token::Sub)) {
       parseToken(tokens);
-      operatorNode->appendParameter(OperatorNode::Sub, parseFactor(tokens));
+      operatorNode->appendParameter(OperatorNode::Sub, parseTerm(tokens));
     } else {
       break;
     }
