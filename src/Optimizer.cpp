@@ -9,14 +9,14 @@ typedef std::list<Parameter> ParameterList;
 float foldFloatAndNumberNode(Op op, float number, NumberNode *numberNode) {
   float right = numberNode->getNumber();
   switch (op) {
-    case (OperatorNode::Add):
-      return number + right;
-    case (OperatorNode::Sub):
-      return number - right;
-    case (OperatorNode::Mul):
-      return number * right;
-    case (OperatorNode::Div):
-      return number / right;
+  case (OperatorNode::Add):
+    return number + right;
+  case (OperatorNode::Sub):
+    return number - right;
+  case (OperatorNode::Mul):
+    return number * right;
+  case (OperatorNode::Div):
+    return number / right;
   }
   return number;
 }
@@ -28,10 +28,12 @@ void mergeWithChildren(OperatorNode *n) {
   auto iter = parameters.begin();
   while (iter != parameters.end()) {
     Parameter parameter = *iter;
-    OperatorNode *childOperatorNode = dynamic_cast<OperatorNode *>(parameter.node);
+    OperatorNode *childOperatorNode =
+        dynamic_cast<OperatorNode *>(parameter.node);
     if (childOperatorNode) {
       for (Parameter newParameter : childOperatorNode->getParameters()) {
-        if (parameter.op == OperatorNode::Sub || parameter.op == OperatorNode::Div) {
+        if (parameter.op == OperatorNode::Sub ||
+            parameter.op == OperatorNode::Div) {
           newParameter.op = OperatorNode::getOppositeOp(newParameter.op);
         }
         newParameters.push_back(newParameter);
@@ -71,13 +73,16 @@ Node *foldNumberNodes(OperatorNode *n) {
   if (parameters.size() == 0) {
     delete n;
     return new NumberNode(number);
-  } else if ((n->getPrecedence() == OperatorNode::SumPrecedence && number != 0) ||
-      n->getPrecedence() == OperatorNode::ProductPrecedence && number != 1) {
+  } else if ((n->getPrecedence() == OperatorNode::SumPrecedence &&
+              number != 0) ||
+             n->getPrecedence() == OperatorNode::ProductPrecedence &&
+                 number != 1) {
     n->appendParameter(new NumberNode(number));
   }
 
-  // If there is only one parameter left, return the node for reflexive operators. For
-  // non-reflexive operators, prepend parameters to maintain correctness.
+  // If there is only one parameter left, return the node for reflexive
+  // operators. For non-reflexive operators, prepend parameters to maintain
+  // correctness.
   if (parameters.size() == 1) {
     if (parameters.front().op == OperatorNode::Sub) {
       n->prependParameter(new NumberNode(0));
@@ -92,9 +97,7 @@ Node *foldNumberNodes(OperatorNode *n) {
   return n;
 }
 
-Node *foldConstants(OperatorNode *n) {
-  return foldNumberNodes(n);
-}
+Node *foldConstants(OperatorNode *n) { return foldNumberNodes(n); }
 
 Node *optimize(Node *n) {
   OperatorNode *operatorNode = dynamic_cast<OperatorNode *>(n);

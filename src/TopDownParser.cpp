@@ -1,18 +1,19 @@
 #include "TopDownParser.h"
 #include <iostream>
 
-Node * TopDownParser::parse(Tokens &tokens) {
-  Node *n =  parseExpression(tokens);
+Node *TopDownParser::parse(Tokens &tokens) {
+  Node *n = parseExpression(tokens);
   if (!tokens.empty()) {
     error("unexpected token");
   }
   return n;
 }
 
-Node * TopDownParser::parseExpression(Tokens &tokens) {
+Node *TopDownParser::parseExpression(Tokens &tokens) {
   Node *n = parseTerm(tokens);
 
-  if (!isNextTokenKind(tokens, Token::Add) && !isNextTokenKind(tokens, Token::Sub)) {
+  if (!isNextTokenKind(tokens, Token::Add) &&
+      !isNextTokenKind(tokens, Token::Sub)) {
     return n;
   }
 
@@ -32,13 +33,15 @@ Node * TopDownParser::parseExpression(Tokens &tokens) {
   return operatorNode;
 }
 
-Node * TopDownParser::parseTerm(Tokens &tokens) {
+Node *TopDownParser::parseTerm(Tokens &tokens) {
   Node *n = parseFactor(tokens);
-  if (!isNextTokenKind(tokens, Token::Mul) && !isNextTokenKind(tokens, Token::Div)) {
+  if (!isNextTokenKind(tokens, Token::Mul) &&
+      !isNextTokenKind(tokens, Token::Div)) {
     return n;
   }
 
-  OperatorNode *operatorNode = new OperatorNode(OperatorNode::ProductPrecedence, n);
+  OperatorNode *operatorNode =
+      new OperatorNode(OperatorNode::ProductPrecedence, n);
   while (true) {
     if (isNextTokenKind(tokens, Token::Mul)) {
       parseToken(tokens);
@@ -54,7 +57,7 @@ Node * TopDownParser::parseTerm(Tokens &tokens) {
   return operatorNode;
 }
 
-Node * TopDownParser::parseFactor(Tokens &tokens) {
+Node *TopDownParser::parseFactor(Tokens &tokens) {
   Node *n = nullptr;
 
   if (isNextTokenKind(tokens, Token::LeftParen)) {
@@ -68,7 +71,7 @@ Node * TopDownParser::parseFactor(Tokens &tokens) {
   return n;
 }
 
-Node * TopDownParser::parseValue(Tokens &tokens) {
+Node *TopDownParser::parseValue(Tokens &tokens) {
   Node *n = nullptr;
 
   if (isNextTokenKind(tokens, Token::Id)) {
@@ -103,4 +106,3 @@ void TopDownParser::error(std::string msg) {
   std::cerr << "fatal: " << msg << std::endl;
   exit(1);
 }
-  

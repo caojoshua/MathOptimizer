@@ -2,15 +2,12 @@
 #include <iostream>
 #include <sstream>
 
-OperatorNode *Node::getParent() {
-  return this->parent;
-}
+OperatorNode *Node::getParent() { return this->parent; }
 
-void Node::setParent(OperatorNode *parent) {
-  this->parent = parent;
-}
+void Node::setParent(OperatorNode *parent) { this->parent = parent; }
 
-OperatorNode::OperatorNode(Precedence precedence, Node *node) : precedence(precedence) {
+OperatorNode::OperatorNode(Precedence precedence, Node *node)
+    : precedence(precedence) {
   this->appendParameter(node);
 }
 
@@ -31,9 +28,7 @@ std::string OperatorNode::codeGen() {
   return s;
 }
 
-std::string OperatorNode::toString() {
-  return "not implemented yet";
-}
+std::string OperatorNode::toString() { return "not implemented yet"; }
 
 OperatorNode::Precedence OperatorNode::getPrecedence() {
   return this->precedence;
@@ -65,28 +60,28 @@ void OperatorNode::prependParameter(Node *node) {
 
 unsigned OperatorNode::getOpPrecedence(Op op) {
   switch (op) {
-    case Add:
-    case Sub:
-      return 0;
-    case Mul:
-    case Div:
-      return 1;
-    default:
-      OperatorNode::unknownOperatorError(op);
+  case Add:
+  case Sub:
+    return 0;
+  case Mul:
+  case Div:
+    return 1;
+  default:
+    OperatorNode::unknownOperatorError(op);
   }
   return 0;
 }
 
 OperatorNode::Op OperatorNode::getOppositeOp(Op op) {
   switch (op) {
-    case Add:
-      return Sub;
-    case Sub:
-      return Add;
-    case Mul:
-      return Div;
-    case Div:
-      return Mul;
+  case Add:
+    return Sub;
+  case Sub:
+    return Add;
+  case Mul:
+    return Div;
+  case Div:
+    return Mul;
   }
   unknownOperatorError(op);
   return Add;
@@ -94,28 +89,28 @@ OperatorNode::Op OperatorNode::getOppositeOp(Op op) {
 
 OperatorNode::Op OperatorNode::getDefaultOp() {
   switch (this->precedence) {
-    case SumPrecedence:
-      return Add;
-    case ProductPrecedence:
-      return Mul;
+  case SumPrecedence:
+    return Add;
+  case ProductPrecedence:
+    return Mul;
   }
   return Add;
 }
 
 std::string OperatorNode::opToStr(Op op) {
   switch (op) {
-    case Add:
-      return "+";
-      break;
-    case Sub:
-      return "-";
-      break;
-    case Mul:
-      return "*";
-      break;
-    case Div:
-      return "/";
-      break;
+  case Add:
+    return "+";
+    break;
+  case Sub:
+    return "-";
+    break;
+  case Mul:
+    return "*";
+    break;
+  case Div:
+    return "/";
+    break;
   }
   unknownOperatorError(op);
   return "";
@@ -124,7 +119,8 @@ std::string OperatorNode::opToStr(Op op) {
 std::string OperatorNode::childNodeCodeGen(Node *child) {
   std::string nodeStr = child->codeGen();
   OperatorNode *childOperatorNode = dynamic_cast<OperatorNode *>(child);
-  if (childOperatorNode && childOperatorNode->getPrecedence() < this->precedence) {
+  if (childOperatorNode &&
+      childOperatorNode->getPrecedence() < this->precedence) {
     nodeStr = '(' + nodeStr + ')';
   }
   return nodeStr;
@@ -135,17 +131,11 @@ void OperatorNode::unknownOperatorError(Op op) {
   exit(1);
 }
 
-std::string IdentifierNode::codeGen() {
-  return this->identifier;
-}
+std::string IdentifierNode::codeGen() { return this->identifier; }
 
-std::string IdentifierNode::toString() {
-  return this->identifier;
-}
+std::string IdentifierNode::toString() { return this->identifier; }
 
-std::string IdentifierNode::getIdentifier() {
-  return this->identifier;
-}
+std::string IdentifierNode::getIdentifier() { return this->identifier; }
 
 std::string NumberNode::codeGen() {
   std::ostringstream ss;
@@ -153,10 +143,6 @@ std::string NumberNode::codeGen() {
   return std::string(ss.str());
 }
 
-std::string NumberNode::toString() {
-  return this->codeGen();
-}
+std::string NumberNode::toString() { return this->codeGen(); }
 
-float NumberNode::getNumber() {
-  return this->number;
-}
+float NumberNode::getNumber() { return this->number; }
