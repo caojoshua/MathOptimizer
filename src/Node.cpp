@@ -43,20 +43,24 @@ std::list<OperatorNode::Parameter> &OperatorNode::getParameters() {
   return parameters;
 }
 
+bool OperatorNode::appendParameter(Parameter parameter) {
+  if (this->precedence != getOpPrecedence(parameter.op)) {
+    return false;
+  }
+  parameters.push_back(parameter);
+  return true;
+}
+
 void OperatorNode::appendParameter(Node *node) {
   parameters.push_back(Parameter{getDefaultOp(), node});
 }
 
-void OperatorNode::prependParameter(Node *node) {
-  parameters.push_front(Parameter{getDefaultOp(), node});
+bool OperatorNode::appendParameter(Op op, Node *node) {
+  return this->appendParameter(Parameter{op, node});
 }
 
-bool OperatorNode::appendParameter(Op op, Node *node) {
-  if (this->precedence != getOpPrecedence(op)) {
-    return false;
-  }
-  parameters.push_back(Parameter{op, node});
-  return true;
+void OperatorNode::prependParameter(Node *node) {
+  parameters.push_front(Parameter{getDefaultOp(), node});
 }
 
 unsigned OperatorNode::getOpPrecedence(Op op) {
@@ -71,6 +75,21 @@ unsigned OperatorNode::getOpPrecedence(Op op) {
       OperatorNode::unknownOperatorError(op);
   }
   return 0;
+}
+
+OperatorNode::Op OperatorNode::getOppositeOp(Op op) {
+  switch (op) {
+    case Add:
+      return Sub;
+    case Sub:
+      return Add;
+    case Mul:
+      return Div;
+    case Div:
+      return Mul;
+  }
+  unknownOperatorError(op);
+  return Add;
 }
 
 OperatorNode::Op OperatorNode::getDefaultOp() {
@@ -97,9 +116,8 @@ std::string OperatorNode::opToStr(Op op) {
     case Div:
       return "/";
       break;
-    default:
-      unknownOperatorError(op);
   }
+  unknownOperatorError(op);
   return "";
 }
 

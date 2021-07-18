@@ -46,11 +46,13 @@ class OperatorNode : public Node {
 
     Precedence getPrecedence();
     std::list<Parameter> &getParameters();
+    bool appendParameter(Parameter parameter);
     void appendParameter(Node *node);
-    void prependParameter(Node *node);
     bool appendParameter(Op op, Node *node);
+    void prependParameter(Node *node);
 
     static unsigned getOpPrecedence(Op op);
+    static Op getOppositeOp(Op op);
     static std::string opToStr(Op op);
     static void unknownOperatorError(Op op);
 

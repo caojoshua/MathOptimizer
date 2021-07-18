@@ -1,5 +1,6 @@
 #include "Optimizer.h"
 #include <iostream>
+#include <vector>
 
 typedef OperatorNode::Op Op;
 typedef OperatorNode::Parameter Parameter;
@@ -18,6 +19,36 @@ float foldFloatAndNumberNode(Op op, float number, NumberNode *numberNode) {
       return number / right;
   }
   return number;
+}
+
+void mergeWithChildren(OperatorNode *n) {
+  std::list<Parameter> &parameters = n->getParameters();
+  std::vector<Parameter> newParameters;
+
+  auto iter = parameters.begin();
+  while (iter != parameters.end()) {
+    Parameter parameter = *iter;
+    OperatorNode *childOperatorNode = dynamic_cast<OperatorNode *>(parameter.node);
+    if (childOperatorNode) {
+      for (Parameter newParameter : childOperatorNode->getParameters()) {
+        if (parameter.op == OperatorNode::Sub || parameter.op == OperatorNode::Div) {
+          newParameter.op = OperatorNode::getOppositeOp(newParameter.op);
+        }
+        newParameters.push_back(newParameter);
+      }
+
+      auto next = iter;
+      ++next;
+      parameters.erase(iter);
+      iter = next;
+      continue;
+    }
+    ++iter;
+  }
+
+  for (Parameter newParameter : newParameters) {
+    n->appendParameter(newParameter);
+  }
 }
 
 Node *foldNumberNodes(OperatorNode *n) {
@@ -77,5 +108,7 @@ Node *optimize(Node *n) {
     iter->node = optimize(iter->node);
     ++iter;
   }
+
+  mergeWithChildren(operatorNode);
   return foldConstants(operatorNode);
 }
