@@ -101,7 +101,7 @@ std::string OperatorNode::opToStr(Op op) {
 std::string OperatorNode::childNodeCodeGen(Node *child) {
   std::string nodeStr = child->codeGen();
   OperatorNode *childOperatorNode = dynamic_cast<OperatorNode *>(child);
-  if (childOperatorNode) {
+  if (childOperatorNode && childOperatorNode->getPrecedence() < this->precedence) {
     nodeStr = '(' + nodeStr + ')';
   }
   return nodeStr;
