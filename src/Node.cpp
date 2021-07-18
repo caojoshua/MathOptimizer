@@ -20,16 +20,11 @@ std::string OperatorNode::codeGen() {
   }
 
   auto iter = parameters.cbegin();
-  std::string s = iter->node->codeGen();
+  std::string s = childNodeCodeGen(iter->node);
   ++iter;
 
   while (iter != parameters.cend()) {
-    std::string nodeStr = iter->node->codeGen();
-    OperatorNode *childOperatorNode = dynamic_cast<OperatorNode *>(iter->node);
-    if (childOperatorNode) {
-      nodeStr = '(' + nodeStr + ')';
-    }
-    s += ' ' + opToStr(iter->op) + ' ' + nodeStr;
+    s += ' ' + opToStr(iter->op) + ' ' + childNodeCodeGen(iter->node);
     ++iter;
   }
 
@@ -101,6 +96,15 @@ std::string OperatorNode::opToStr(Op op) {
       unknownOperatorError(op);
   }
   return "";
+}
+
+std::string OperatorNode::childNodeCodeGen(Node *child) {
+  std::string nodeStr = child->codeGen();
+  OperatorNode *childOperatorNode = dynamic_cast<OperatorNode *>(child);
+  if (childOperatorNode) {
+    nodeStr = '(' + nodeStr + ')';
+  }
+  return nodeStr;
 }
 
 void OperatorNode::unknownOperatorError(Op op) {

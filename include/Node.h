@@ -58,6 +58,7 @@ class OperatorNode : public Node {
     std::list<Parameter> parameters; 
 
     std::string opToStr();
+    std::string childNodeCodeGen(Node *child);
 };
 
 class IdentifierNode : public Node {
