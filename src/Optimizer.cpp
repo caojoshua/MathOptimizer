@@ -40,8 +40,22 @@ Node *foldNumberNodes(OperatorNode *n) {
   if (parameters.size() == 0) {
     delete n;
     return new NumberNode(number);
-  } else if (number != 0) {
+  } else if ((n->getPrecedence() == OperatorNode::SumPrecedence && number != 0) ||
+      n->getPrecedence() == OperatorNode::ProductPrecedence && number != 1) {
     n->appendParameter(new NumberNode(number));
+  }
+
+  // If there is only one parameter left, return the node for reflexive operators. For
+  // non-reflexive operators, prepend parameters to maintain correctness.
+  if (parameters.size() == 1) {
+    if (parameters.front().op == OperatorNode::Sub) {
+      n->prependParameter(new NumberNode(0));
+    } else if (parameters.front().op == OperatorNode::Div) {
+      n->prependParameter(new NumberNode(1));
+    } else {
+      delete n;
+      return parameters.front().node;
+    }
   }
 
   return n;

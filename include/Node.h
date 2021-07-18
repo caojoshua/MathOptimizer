@@ -47,6 +47,7 @@ class OperatorNode : public Node {
     Precedence getPrecedence();
     std::list<Parameter> &getParameters();
     void appendParameter(Node *node);
+    void prependParameter(Node *node);
     bool appendParameter(Op op, Node *node);
 
     static unsigned getOpPrecedence(Op op);
@@ -57,6 +58,7 @@ class OperatorNode : public Node {
     Precedence precedence;
     std::list<Parameter> parameters; 
 
+    Op getDefaultOp();
     std::string opToStr();
     std::string childNodeCodeGen(Node *child);
 };

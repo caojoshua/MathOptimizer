@@ -44,16 +44,11 @@ std::list<OperatorNode::Parameter> &OperatorNode::getParameters() {
 }
 
 void OperatorNode::appendParameter(Node *node) {
-  Op op;
-  switch (this->precedence) {
-    case SumPrecedence:
-      op = Add;
-      break;
-    case ProductPrecedence:
-      op = Mul;
-      break;
-  }
-  parameters.push_back(Parameter{op, node});
+  parameters.push_back(Parameter{getDefaultOp(), node});
+}
+
+void OperatorNode::prependParameter(Node *node) {
+  parameters.push_front(Parameter{getDefaultOp(), node});
 }
 
 bool OperatorNode::appendParameter(Op op, Node *node) {
@@ -76,6 +71,16 @@ unsigned OperatorNode::getOpPrecedence(Op op) {
       OperatorNode::unknownOperatorError(op);
   }
   return 0;
+}
+
+OperatorNode::Op OperatorNode::getDefaultOp() {
+  switch (this->precedence) {
+    case SumPrecedence:
+      return Add;
+    case ProductPrecedence:
+      return Mul;
+  }
+  return Add;
 }
 
 std::string OperatorNode::opToStr(Op op) {
