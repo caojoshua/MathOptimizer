@@ -20,9 +20,10 @@ float foldFloatAndNumberNode(Op op, float number, NumberNode *numberNode) {
   return number;
 }
 
-void foldNumberNodes(OperatorNode *n) {
+Node *foldNumberNodes(OperatorNode *n) {
   ParameterList &parameters = n->getParameters();
-  float number = 0;
+  float number = n->getPrecedence() == OperatorNode::SumPrecedence ? 0 : 1;
+
   auto iter = parameters.begin();
   while (iter != parameters.end()) {
     if (NumberNode *numberNode = dynamic_cast<NumberNode *>(iter->node)) {
@@ -36,20 +37,31 @@ void foldNumberNodes(OperatorNode *n) {
     }
     ++iter;
   }
-  if (number != 0 || parameters.size() == 0) {
+  if (parameters.size() == 0) {
+    delete n;
+    return new NumberNode(number);
+  } else if (number != 0) {
     n->appendParameter(new NumberNode(number));
   }
+
+  return n;
 }
 
 Node *foldConstants(OperatorNode *n) {
-  foldNumberNodes(n);
-  return n;
+  return foldNumberNodes(n);
 }
 
 Node *optimize(Node *n) {
   OperatorNode *operatorNode = dynamic_cast<OperatorNode *>(n);
   if (!operatorNode) {
     return n;
+  }
+
+  ParameterList &parameters = operatorNode->getParameters();
+  auto iter = parameters.begin();
+  while (iter != parameters.end()) {
+    iter->node = optimize(iter->node);
+    ++iter;
   }
   return foldConstants(operatorNode);
 }
