@@ -11,6 +11,24 @@ OperatorNode::OperatorNode(Precedence precedence, Node *node)
   this->appendParameter(node);
 }
 
+OperatorNode::OperatorNode(Op op, Node *left, Node *right) {
+  switch (op) {
+    case Add:
+    case Sub:
+      this->precedence = SumPrecedence;
+      break;
+    case Mul:
+    case Div:
+      this->precedence = ProductPrecedence;
+      break;
+    default:
+      unknownOperatorError(op);
+  }
+
+  this->appendParameter(left);
+  this->appendParameter(op, right);
+}
+
 std::string OperatorNode::codeGen() {
   if (parameters.size() == 0) {
     return "";

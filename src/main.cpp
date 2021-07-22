@@ -1,3 +1,4 @@
+#include "BottomUpParser.h"
 #include "Optimizer.h"
 #include "Scanner.h"
 #include "TopDownParser.h"
@@ -12,12 +13,14 @@ int main(int argc, char *argv[]) {
   }
 
   std::list<Token> tokens = scan(argv[1]);
+  std::list<Token> bottomUpTokens = std::list<Token>(tokens);
 
-  Node *topDownOutput = TopDownParser::parse(tokens);
+  Node *topDownOutput = optimize(TopDownParser::parse(tokens));
+  std::cout << "TopDown output: " << std::endl << topDownOutput->codeGen() << std::endl << std::endl;
 
-  topDownOutput = optimize(topDownOutput);
-
-  std::cout << topDownOutput->codeGen() << std::endl;
+  BottomUpParser bottomUpParser(bottomUpTokens);
+  Node *bottomUpOutput = optimize(bottomUpParser.parse());
+  std::cout << "BottomUp output: " << std::endl << bottomUpOutput->codeGen() << std::endl;
 
   return 0;
 }

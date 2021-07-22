@@ -15,6 +15,7 @@ public:
     Div,
     LeftParen,
     RightParen,
+    Unknown,
   };
 
   Token(Kind kind) : kind(kind){};

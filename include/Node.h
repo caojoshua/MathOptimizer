@@ -32,6 +32,7 @@ public:
   };
 
   OperatorNode(Precedence precedence, Node *node);
+  OperatorNode(Op op, Node *left, Node *right);
 
   std::string codeGen();
   std::string toString();
