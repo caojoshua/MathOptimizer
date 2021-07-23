@@ -53,7 +53,7 @@ void mergeWithChildren(OperatorNode *n) {
   }
 }
 
-Node *foldNumberNodes(OperatorNode *n) {
+Node *foldConstants(OperatorNode *n) {
   ParameterList &parameters = n->getParameters();
   float number = n->getPrecedence() == OperatorNode::SumPrecedence ? 0 : 1;
 
@@ -96,8 +96,6 @@ Node *foldNumberNodes(OperatorNode *n) {
 
   return n;
 }
-
-Node *foldConstants(OperatorNode *n) { return foldNumberNodes(n); }
 
 Node *optimize(Node *n) {
   OperatorNode *operatorNode = dynamic_cast<OperatorNode *>(n);
