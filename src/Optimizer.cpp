@@ -1,5 +1,6 @@
 #include "Optimizer.h"
 #include <iostream>
+#include <map>
 #include <vector>
 
 typedef OperatorNode::Op Op;
@@ -30,7 +31,8 @@ void mergeWithChildren(OperatorNode *n) {
     Parameter parameter = *iter;
     OperatorNode *childOperatorNode =
         dynamic_cast<OperatorNode *>(parameter.node);
-    if (childOperatorNode && n->getPrecedence() == childOperatorNode->getPrecedence()) {
+    if (childOperatorNode &&
+        n->getPrecedence() == childOperatorNode->getPrecedence()) {
       for (Parameter newParameter : childOperatorNode->getParameters()) {
         if (parameter.op == OperatorNode::Sub ||
             parameter.op == OperatorNode::Div) {
@@ -77,7 +79,7 @@ Node *foldConstants(OperatorNode *n) {
               number != 0) ||
              n->getPrecedence() == OperatorNode::ProductPrecedence &&
                  number != 1) {
-    n->appendParameter(new NumberNode(number));
+    n->prependParameter(new NumberNode(number));
   }
 
   // If there is only one parameter left, return the node for reflexive
@@ -97,6 +99,119 @@ Node *foldConstants(OperatorNode *n) {
   return n;
 }
 
+NumberNode *getCoefficient(OperatorNode *n) {
+  if (n->getParameters().size() == 0) {
+    return nullptr;
+  }
+  // We assume the constant is in the front, and is preceded by a + or *, based
+  // on previous computations
+  return dynamic_cast<NumberNode *>(n->getParameters().front().node);
+}
+
+NumberNode *getCoefficient(Node *n) {
+  OperatorNode *operatorNode = dynamic_cast<OperatorNode *>(n);
+  if (!operatorNode) {
+    return nullptr;
+  }
+  return getCoefficient(operatorNode);
+}
+
+bool sameVariableTerms(Node *_a, Node *_b) {
+  IdentifierNode *aIdentifier = dynamic_cast<IdentifierNode *>(_a);
+  if (aIdentifier) {
+    return *(aIdentifier) == _b;
+  }
+
+  OperatorNode *a = dynamic_cast<OperatorNode *>(_a);
+  OperatorNode *b = dynamic_cast<OperatorNode *>(_b);
+  if (!a || !b) {
+    return false;
+  }
+
+  ParameterList &aParams = a->getParameters();
+  ParameterList &bParams = b->getParameters();
+
+  auto aIter = aParams.cbegin();
+  auto bIter = bParams.cbegin();
+
+  while (aIter != aParams.cend() && bIter != bParams.cend()) {
+    NumberNode *aNumberNode = dynamic_cast<NumberNode *>(aIter->node);
+    NumberNode *bNumberNode = dynamic_cast<NumberNode *>(bIter->node);
+
+    if (!aNumberNode && !bNumberNode) {
+      if (aIter->op != bIter->op || *(aIter->node) != bIter->node) {
+        return false;
+      }
+    }
+
+    ++aIter;
+    ++bIter;
+  }
+
+  return aIter == aParams.cend() && bIter == bParams.cend();
+}
+
+// Fold terms ie. 2x + 3x = 5x
+Node *foldTerms(Node *n) {
+  OperatorNode *operatorNode = dynamic_cast<OperatorNode *>(n);
+  if (!operatorNode ||
+      operatorNode->getPrecedence() != OperatorNode::SumPrecedence) {
+    return n;
+  }
+
+  std::list<Parameter> termCoefficients;
+  ParameterList &parameters = operatorNode->getParameters();
+
+  for (Parameter parameter : parameters) {
+    Node *childNode = parameter.node->clone();
+
+    // check if node with terms are already in the coefficients map
+    Parameter existingCoefficient = Parameter{OperatorNode::Add, nullptr};
+    for (auto &termCoefficient : termCoefficients) {
+      if (termCoefficient.op == parameter.op &&
+          sameVariableTerms(termCoefficient.node, childNode)) {
+        existingCoefficient = termCoefficient;
+        break;
+      }
+    }
+
+    if (existingCoefficient.node == nullptr) {
+      // Add the node to the termCoefficients if it does not already exist
+      termCoefficients.push_back(Parameter{parameter.op, childNode});
+    } else {
+      // Compute the coefficient to be added to the term, 1 by default
+      unsigned coefficient = 1;
+      NumberNode *childNumberNode = getCoefficient(childNode);
+      if (childNumberNode) {
+        coefficient = childNumberNode->getNumber();
+      }
+
+      // TODO: some of the child nodes won't be operator nodes ie. plain ol' 'x'
+      // in 2 + x
+      OperatorNode *operatorNode =
+          dynamic_cast<OperatorNode *>(existingCoefficient.node);
+      if (operatorNode) {
+        NumberNode *numberNode = getCoefficient(operatorNode);
+        if (numberNode) {
+          numberNode->setNumber(numberNode->getNumber() + coefficient);
+        } else {
+          // Add a coefficient to the node if it does not already exist
+          operatorNode->appendParameter(new NumberNode(coefficient));
+        }
+      }
+    }
+  }
+
+  // construct a new node with the terms added up
+  OperatorNode *constructedOperatorNode =
+      new OperatorNode(OperatorNode::SumPrecedence);
+  for (auto &termCoefficient : termCoefficients) {
+    constructedOperatorNode->appendParameter(termCoefficient.op,
+                                             termCoefficient.node);
+  }
+  return constructedOperatorNode;
+}
+
 Node *optimize(Node *n) {
   OperatorNode *operatorNode = dynamic_cast<OperatorNode *>(n);
   if (!operatorNode) {
@@ -111,5 +226,8 @@ Node *optimize(Node *n) {
   }
 
   mergeWithChildren(operatorNode);
-  return foldConstants(operatorNode);
+  n = foldConstants(operatorNode);
+  n = foldTerms(n);
+
+  return n;
 }

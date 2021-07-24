@@ -11,10 +11,13 @@ class Node {
 public:
   Node() : parent(nullptr){};
   virtual ~Node(){};
-  OperatorNode *getParent();
-  void setParent(OperatorNode *parent);
+  virtual bool operator==(Node *other);
+  virtual bool operator!=(Node *other);
+  virtual Node *clone() = 0;
   virtual std::string codeGen() = 0;
   virtual std::string toString() = 0;
+  OperatorNode *getParent();
+  void setParent(OperatorNode *parent);
 
 private:
   OperatorNode *parent;
@@ -31,8 +34,10 @@ public:
     Node *node;
   };
 
+  OperatorNode(Precedence precedence) : precedence(precedence) {}
   OperatorNode(Precedence precedence, Node *node);
 
+  virtual Node *clone();
   std::string codeGen();
   std::string toString();
 
@@ -42,6 +47,7 @@ public:
   void appendParameter(Node *node);
   bool appendParameter(Op op, Node *node);
   void prependParameter(Node *node);
+  void popFrontParameter();
 
   static unsigned getOpPrecedence(Op op);
   static Op getOppositeOp(Op op);
@@ -60,6 +66,8 @@ private:
 class IdentifierNode : public Node {
 public:
   IdentifierNode(std::string identifier) : Node(), identifier(identifier) {}
+  bool operator==(Node *other);
+  virtual Node *clone();
   std::string codeGen();
   std::string toString();
   std::string getIdentifier();
@@ -71,9 +79,12 @@ private:
 class NumberNode : public Node {
 public:
   NumberNode(float number) : Node(), number(number) {}
+  bool operator==(Node *other);
+  virtual Node *clone();
   std::string codeGen();
   std::string toString();
   float getNumber();
+  void setNumber(float number);
 
 private:
   static std::ostringstream ss;

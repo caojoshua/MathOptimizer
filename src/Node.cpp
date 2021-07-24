@@ -2,13 +2,25 @@
 #include <iostream>
 #include <sstream>
 
+bool Node::operator==(Node *other) { return false; }
+
+bool Node::operator!=(Node *other) { return !(*this == other); }
+
 OperatorNode *Node::getParent() { return this->parent; }
 
 void Node::setParent(OperatorNode *parent) { this->parent = parent; }
 
 OperatorNode::OperatorNode(Precedence precedence, Node *node)
-    : precedence(precedence) {
+    : OperatorNode(precedence) {
   this->appendParameter(node);
+}
+
+Node *OperatorNode::clone() {
+  OperatorNode *n = new OperatorNode(this->precedence);
+  for (Parameter parameter : this->parameters) {
+    n->appendParameter(parameter.op, parameter.node->clone());
+  }
+  return n;
 }
 
 std::string OperatorNode::codeGen() {
@@ -57,6 +69,8 @@ bool OperatorNode::appendParameter(Op op, Node *node) {
 void OperatorNode::prependParameter(Node *node) {
   parameters.push_front(Parameter{getDefaultOp(), node});
 }
+
+void OperatorNode::popFrontParameter() { parameters.pop_front(); }
 
 unsigned OperatorNode::getOpPrecedence(Op op) {
   switch (op) {
@@ -131,11 +145,27 @@ void OperatorNode::unknownOperatorError(Op op) {
   exit(1);
 }
 
+bool IdentifierNode::operator==(Node *other) {
+  IdentifierNode *otherIdentifierNode = dynamic_cast<IdentifierNode *>(other);
+  return otherIdentifierNode
+             ? this->identifier == otherIdentifierNode->getIdentifier()
+             : false;
+}
+
+Node *IdentifierNode::clone() { return new IdentifierNode(this->identifier); }
+
 std::string IdentifierNode::codeGen() { return this->identifier; }
 
 std::string IdentifierNode::toString() { return this->identifier; }
 
 std::string IdentifierNode::getIdentifier() { return this->identifier; }
+
+bool NumberNode::operator==(Node *other) {
+  NumberNode *otherNumberNode = dynamic_cast<NumberNode *>(other);
+  return otherNumberNode ? this->number == otherNumberNode->getNumber() : false;
+}
+
+Node *NumberNode::clone() { return new NumberNode(this->number); }
 
 std::string NumberNode::codeGen() {
   std::ostringstream ss;
@@ -146,3 +176,5 @@ std::string NumberNode::codeGen() {
 std::string NumberNode::toString() { return this->codeGen(); }
 
 float NumberNode::getNumber() { return this->number; }
+
+void NumberNode::setNumber(float number) { this->number = number; }
