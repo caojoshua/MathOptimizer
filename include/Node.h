@@ -38,6 +38,7 @@ public:
   OperatorNode(Precedence precedence) : precedence(precedence) {}
   OperatorNode(Precedence precedence, Node *node);
 
+  virtual bool operator==(Node *other);
   virtual Node *clone();
   virtual bool sortCompare(Node *other);
   std::string codeGen();

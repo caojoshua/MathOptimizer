@@ -167,7 +167,6 @@ bool sameVariableTerms(Node *_a, Node *_b) {
     }
 
     if (aIter->op != bIter->op || *(aIter->node) != bIter->node) {
-      std::cout << "bust\n";
       return false;
     }
 

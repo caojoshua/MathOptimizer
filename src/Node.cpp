@@ -15,6 +15,32 @@ OperatorNode::OperatorNode(Precedence precedence, Node *node)
   this->appendParameter(node);
 }
 
+bool OperatorNode::operator==(Node *other) {
+  OperatorNode *otherOperatorNode = dynamic_cast<OperatorNode *>(other);
+  if (!otherOperatorNode) {
+    return false;
+  }
+
+  auto thisIter = this->parameters.cbegin();
+  auto otherIter = otherOperatorNode->parameters.cbegin();
+
+  // Compare all parameters for both nodes. Order of parameters must be the same
+  // for two operator nodes to be equivalent, even if the operator is
+  // commutative.
+  while (thisIter != this->parameters.cend() &&
+         otherIter != otherOperatorNode->parameters.cend()) {
+    if (thisIter->op != otherIter->op || *(thisIter->node) != otherIter->node) {
+      return false;
+    }
+
+    ++thisIter;
+    ++otherIter;
+  }
+
+  return thisIter == this->parameters.cend() &&
+         otherIter == otherOperatorNode->parameters.cend();
+}
+
 Node *OperatorNode::clone() {
   OperatorNode *n = new OperatorNode(this->precedence);
   for (Parameter parameter : this->parameters) {
@@ -165,7 +191,6 @@ bool IdentifierNode::sortCompare(Node *other) {
   if (otherNumberNode) {
     return false;
   }
-
 
   // When both nodes are IdentifierNodes, compare their identifier strings
   IdentifierNode *otherIdentifierNode = dynamic_cast<IdentifierNode *>(other);
