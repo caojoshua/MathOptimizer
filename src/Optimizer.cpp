@@ -99,6 +99,21 @@ Node *foldConstants(OperatorNode *n) {
   return n;
 }
 
+// Sorts nodes such that they have consistent ordering. This is important when
+// we compare terms to be added, so that we can linearly scan for equivalent
+// terms.
+// ie. x*y+y*x -> x*y->x*y
+void sortNodes(Node *n) {
+  OperatorNode *operatorNode = dynamic_cast<OperatorNode *>(n);
+  if (!n) {
+    return;
+  }
+
+  operatorNode->getParameters().sort([](Parameter a, Parameter b) {
+    return a.op < b.op ? true : a.node->sortCompare(b.node);
+  });
+}
+
 NumberNode *getCoefficient(OperatorNode *n) {
   if (n->getParameters().size() == 0) {
     return nullptr;
@@ -250,6 +265,7 @@ Node *optimize(Node *n) {
 
   mergeWithChildren(operatorNode);
   n = foldConstants(operatorNode);
+  sortNodes(n);
   n = foldTerms(n);
 
   return n;

@@ -14,6 +14,7 @@ public:
   virtual bool operator==(Node *other);
   virtual bool operator!=(Node *other);
   virtual Node *clone() = 0;
+  virtual bool sortCompare(Node *other) = 0;
   virtual std::string codeGen() = 0;
   virtual std::string toString() = 0;
   OperatorNode *getParent();
@@ -38,6 +39,7 @@ public:
   OperatorNode(Precedence precedence, Node *node);
 
   virtual Node *clone();
+  virtual bool sortCompare(Node *other);
   std::string codeGen();
   std::string toString();
 
@@ -68,6 +70,7 @@ public:
   IdentifierNode(std::string identifier) : Node(), identifier(identifier) {}
   bool operator==(Node *other);
   virtual Node *clone();
+  virtual bool sortCompare(Node *other);
   std::string codeGen();
   std::string toString();
   std::string getIdentifier();
@@ -81,6 +84,7 @@ public:
   NumberNode(float number) : Node(), number(number) {}
   bool operator==(Node *other);
   virtual Node *clone();
+  virtual bool sortCompare(Node *other);
   std::string codeGen();
   std::string toString();
   float getNumber();
