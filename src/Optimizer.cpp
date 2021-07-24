@@ -110,7 +110,16 @@ void sortNodes(Node *n) {
   }
 
   operatorNode->getParameters().sort([](Parameter a, Parameter b) {
-    return a.op < b.op ? true : a.node->sortCompare(b.node);
+    // We use an arbitrary sort comparison that can guarentee consistency using
+    // the node's codegen. It is possible that two different types of nodes ie.
+    // IdentiferNode 'x'
+    // OperatorNode with single parameter 'x'
+    // In which case its possible the nodes can inconsistently show on the left
+    // or right of each other. But in practice, OpertorNodes would with a single
+    // parameter would have already been extracted into a single leaf node.
+    // NumberNodes and IdentifierNodes should also not conflict, since
+    // IdentifierNode strings can never be just a number.
+    return a.op < b.op ? true : a.node->codeGen() < b.node->codeGen();
   });
 }
 
@@ -263,8 +272,9 @@ Node *optimize(Node *n) {
   }
 
   mergeWithChildren(operatorNode);
+  sortNodes(operatorNode);
   n = foldConstants(operatorNode);
-  sortNodes(n);
+  /* sortNodes(n); */
   n = foldTerms(n);
 
   return n;

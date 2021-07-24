@@ -49,11 +49,6 @@ Node *OperatorNode::clone() {
   return n;
 }
 
-bool OperatorNode::sortCompare(Node *other) {
-  // TODO: how do we sort OperatorNodes?
-  return false;
-}
-
 std::string OperatorNode::codeGen() {
   if (parameters.size() == 0) {
     return "";
@@ -185,23 +180,6 @@ bool IdentifierNode::operator==(Node *other) {
 
 Node *IdentifierNode::clone() { return new IdentifierNode(this->identifier); }
 
-bool IdentifierNode::sortCompare(Node *other) {
-  // IdentifierNodes are always to the right of NumberNode
-  NumberNode *otherNumberNode = dynamic_cast<NumberNode *>(other);
-  if (otherNumberNode) {
-    return false;
-  }
-
-  // When both nodes are IdentifierNodes, compare their identifier strings
-  IdentifierNode *otherIdentifierNode = dynamic_cast<IdentifierNode *>(other);
-  if (otherIdentifierNode) {
-    return this->identifier < otherIdentifierNode->identifier;
-  }
-
-  // IdentifierNodes are always to the left of OperatorNodes
-  return true;
-}
-
 std::string IdentifierNode::codeGen() { return this->identifier; }
 
 std::string IdentifierNode::toString() { return this->identifier; }
@@ -214,17 +192,6 @@ bool NumberNode::operator==(Node *other) {
 }
 
 Node *NumberNode::clone() { return new NumberNode(this->number); }
-
-bool NumberNode::sortCompare(Node *other) {
-  // number nodes are always to the left of other node types
-  NumberNode *otherNumberNode = dynamic_cast<NumberNode *>(other);
-  if (!otherNumberNode) {
-    return true;
-  }
-
-  // when both nodes are number nodes, compare their numbers
-  return this->number < otherNumberNode->number;
-}
 
 std::string NumberNode::codeGen() {
   std::ostringstream ss;
