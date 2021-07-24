@@ -30,7 +30,7 @@ void mergeWithChildren(OperatorNode *n) {
     Parameter parameter = *iter;
     OperatorNode *childOperatorNode =
         dynamic_cast<OperatorNode *>(parameter.node);
-    if (childOperatorNode) {
+    if (childOperatorNode && n->getPrecedence() == childOperatorNode->getPrecedence()) {
       for (Parameter newParameter : childOperatorNode->getParameters()) {
         if (parameter.op == OperatorNode::Sub ||
             parameter.op == OperatorNode::Div) {
