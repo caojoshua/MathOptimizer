@@ -186,7 +186,7 @@ bool sameVariableTerms(Node *_a, Node *_b) {
   return aIter == aParams.cend() && bIter == bParams.cend();
 }
 
-// Fold terms ie. 2x + 3x = 5x
+// Fold terms ie. 2*x + 3*x = 5*x
 Node *foldTerms(Node *n) {
   OperatorNode *operatorNode = dynamic_cast<OperatorNode *>(n);
   if (!operatorNode ||
@@ -203,25 +203,23 @@ Node *foldTerms(Node *n) {
     // check if node with terms are already in the coefficients map
     Parameter *existingCoefficient = nullptr;
     for (auto &termCoefficient : termCoefficients) {
-      if (termCoefficient.op == parameter.op &&
-          sameVariableTerms(termCoefficient.node, childNode)) {
+      if (sameVariableTerms(termCoefficient.node, childNode)) {
         existingCoefficient = &termCoefficient;
         break;
       }
     }
     if (!existingCoefficient) {
-      existingCoefficient = new Parameter{OperatorNode::Add, nullptr};
-    }
-
-    if (existingCoefficient->node == nullptr) {
-      // Add the node to the termCoefficients if it does not already exist
       termCoefficients.push_back(Parameter{parameter.op, childNode});
     } else {
       // Compute the coefficient to be added to the term, 1 by default
-      unsigned coefficient = 1;
+      int coefficient = 1;
       NumberNode *childNumberNode = getCoefficient(childNode);
       if (childNumberNode) {
         coefficient = childNumberNode->getNumber();
+      }
+
+      if (parameter.op == OperatorNode::Sub) {
+        coefficient *= -1;
       }
 
       IdentifierNode *identifierNode =
@@ -274,7 +272,6 @@ Node *optimize(Node *n) {
   mergeWithChildren(operatorNode);
   sortNodes(operatorNode);
   n = foldConstants(operatorNode);
-  /* sortNodes(n); */
   n = foldTerms(n);
 
   return n;
