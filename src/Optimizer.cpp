@@ -91,8 +91,9 @@ Node *foldConstants(OperatorNode *n) {
     } else if (parameters.front().op == OperatorNode::Div) {
       n->prependParameter(new NumberNode(1));
     } else {
+      Node *newNode = parameters.front().node->clone();
       delete n;
-      return parameters.front().node;
+      return newNode;
     }
   }
 

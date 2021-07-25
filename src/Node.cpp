@@ -2,6 +2,17 @@
 #include <iostream>
 #include <sstream>
 
+OperatorNode::OperatorNode(Precedence precedence, Node *node)
+    : OperatorNode(precedence) {
+  this->appendParameter(node);
+}
+
+OperatorNode::~OperatorNode() {
+  for (Parameter parameter : this->parameters) {
+    delete parameter.node;
+  }
+}
+
 bool Node::operator==(Node *other) { return false; }
 
 bool Node::operator!=(Node *other) { return !(*this == other); }
@@ -9,11 +20,6 @@ bool Node::operator!=(Node *other) { return !(*this == other); }
 OperatorNode *Node::getParent() { return this->parent; }
 
 void Node::setParent(OperatorNode *parent) { this->parent = parent; }
-
-OperatorNode::OperatorNode(Precedence precedence, Node *node)
-    : OperatorNode(precedence) {
-  this->appendParameter(node);
-}
 
 bool OperatorNode::operator==(Node *other) {
   OperatorNode *otherOperatorNode = dynamic_cast<OperatorNode *>(other);

@@ -34,8 +34,9 @@ public:
     Node *node;
   };
 
-  OperatorNode(Precedence precedence) : precedence(precedence) {}
+  OperatorNode(Precedence precedence) : precedence(precedence){};
   OperatorNode(Precedence precedence, Node *node);
+  ~OperatorNode();
 
   virtual bool operator==(Node *other);
   virtual Node *clone();
