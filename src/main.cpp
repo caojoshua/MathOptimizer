@@ -13,11 +13,13 @@ int main(int argc, char *argv[]) {
 
   std::list<Token> tokens = scan(argv[1]);
 
-  Node *topDownOutput = TopDownParser::parse(tokens);
+  Node *ast = TopDownParser::parse(tokens);
 
-  topDownOutput = optimize(topDownOutput);
+  ast = optimize(ast);
 
-  std::cout << topDownOutput->codeGen() << std::endl;
+  std::cout << ast->codeGen() << std::endl;
+
+  delete ast;
 
   return 0;
 }

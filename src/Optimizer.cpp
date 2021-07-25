@@ -40,11 +40,7 @@ void mergeWithChildren(OperatorNode *n) {
         }
         newParameters.push_back(newParameter);
       }
-
-      auto next = iter;
-      ++next;
-      parameters.erase(iter);
-      iter = next;
+      iter = parameters.erase(iter);
       continue;
     }
     ++iter;
@@ -199,7 +195,7 @@ Node *foldTerms(Node *n) {
   ParameterList &parameters = operatorNode->getParameters();
 
   for (Parameter parameter : parameters) {
-    Node *childNode = parameter.node->clone();
+    Node *childNode = parameter.node;
 
     // check if node with terms are already in the coefficients map
     Parameter *existingCoefficient = nullptr;
@@ -211,7 +207,7 @@ Node *foldTerms(Node *n) {
     }
 
     if (!existingCoefficient) {
-      termCoefficients.push_back(Parameter{parameter.op, childNode});
+      termCoefficients.push_back(Parameter{parameter.op, childNode->clone()});
       continue;
     }
 
