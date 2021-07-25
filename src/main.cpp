@@ -1,6 +1,6 @@
 #include "Optimizer.h"
-#include "Scanner.h"
 #include "Parser.h"
+#include "Scanner.h"
 #include <iostream>
 
 int main(int argc, char *argv[]) {

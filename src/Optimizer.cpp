@@ -236,8 +236,8 @@ Node *foldTerms(OperatorNode *n) {
       NumberNode *numberNode = getCoefficient(operatorNode);
       if (numberNode) {
         double number = existingCoefficient->op == OperatorNode::Sub
-                           ? numberNode->getNumber() * -1
-                           : numberNode->getNumber();
+                            ? numberNode->getNumber() * -1
+                            : numberNode->getNumber();
         numberNode->setNumber(number + coefficient);
       } else {
         operatorNode->prependParameter(new NumberNode(1 + coefficient));

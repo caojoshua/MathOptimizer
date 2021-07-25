@@ -205,7 +205,7 @@ Node *NumberNode::clone() { return new NumberNode(this->number); }
 
 std::string NumberNode::codeGen() {
   std::ostringstream ss;
-  ss <<  this->number;
+  ss << this->number;
   return std::string(ss.str());
 }
 
