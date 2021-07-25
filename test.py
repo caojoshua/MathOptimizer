@@ -68,6 +68,34 @@ tests = [
         'input': '2*x + 10*x - 5*x',
         'output': '7 * x',
     },
+    {
+        'input': '2*x*y + 3*y*x',
+        'output': '5 * x * y',
+    },
+    {
+        'input': '2*x*y + y*x',
+        'output': '3 * x * y',
+    },
+    {
+        'input': '1*x*y - 5*y*x',
+        'output': '-4 * x * y',
+    },
+    {
+        'input': '2*x/y + 3*x/y',
+        'output': '5 * x / y',
+    },
+    {
+        'input': '2*x*y + 3*y/x',
+        'output': '2 * x * y + 3 / x * y',
+    },
+    {
+        'input': '2*(x+1)*(y-2) + 3*(y-2)*(x+1)',
+        'output': '5 * (-2 + y) * (1 + x)',
+    },
+    {
+        'input': '2*x*y*z + 3*x*y',
+        'output': '2 * x * y * z + 3 * x * y',
+    },
 ]
 
 def printSeparator():

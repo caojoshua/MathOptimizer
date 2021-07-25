@@ -48,6 +48,7 @@ public:
   void appendParameter(Node *node);
   bool appendParameter(Op op, Node *node);
   void prependParameter(Node *node);
+  void prependParameter(Op op, Node *node);
   void popFrontParameter();
 
   static unsigned getOpPrecedence(Op op);

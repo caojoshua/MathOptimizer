@@ -208,41 +208,46 @@ Node *foldTerms(Node *n) {
         break;
       }
     }
+
     if (!existingCoefficient) {
       termCoefficients.push_back(Parameter{parameter.op, childNode});
-    } else {
-      // Compute the coefficient to be added to the term, 1 by default
-      int coefficient = 1;
-      NumberNode *childNumberNode = getCoefficient(childNode);
-      if (childNumberNode) {
-        coefficient = childNumberNode->getNumber();
-      }
+      continue;
+    }
 
-      if (parameter.op == OperatorNode::Sub) {
-        coefficient *= -1;
-      }
+    // Compute the coefficient to be added to the term, 1 by default
+    int coefficient = 1;
+    NumberNode *childNumberNode = getCoefficient(childNode);
+    if (childNumberNode) {
+      coefficient = childNumberNode->getNumber();
+    }
 
-      IdentifierNode *identifierNode =
-          dynamic_cast<IdentifierNode *>(existingCoefficient->node);
-      OperatorNode *operatorNode =
-          dynamic_cast<OperatorNode *>(existingCoefficient->node);
+    if (parameter.op == OperatorNode::Sub) {
+      coefficient *= -1;
+    }
 
-      if (identifierNode) {
-        OperatorNode *operatorNode = new OperatorNode(
-            OperatorNode::SumPrecedence, new NumberNode(1 + coefficient));
-        operatorNode->appendParameter(identifierNode);
-        existingCoefficient->node = operatorNode;
-      } else if (operatorNode) {
-        NumberNode *numberNode = getCoefficient(operatorNode);
-        if (numberNode) {
-          numberNode->setNumber(numberNode->getNumber() + coefficient);
-        } else {
-          operatorNode->prependParameter(new NumberNode(1 + coefficient));
-        }
+    IdentifierNode *identifierNode =
+        dynamic_cast<IdentifierNode *>(existingCoefficient->node);
+    OperatorNode *operatorNode =
+        dynamic_cast<OperatorNode *>(existingCoefficient->node);
+
+    if (identifierNode) {
+      OperatorNode *operatorNode = new OperatorNode(
+          OperatorNode::SumPrecedence, new NumberNode(1 + coefficient));
+      operatorNode->appendParameter(identifierNode);
+      existingCoefficient->node = operatorNode;
+    } else if (operatorNode) {
+      NumberNode *numberNode = getCoefficient(operatorNode);
+      if (numberNode) {
+        float number = existingCoefficient->op == OperatorNode::Sub
+                           ? numberNode->getNumber() * -1
+                           : numberNode->getNumber();
+        numberNode->setNumber(number + coefficient);
       } else {
-        // Add a coefficient to the node if it does not already exist
-        operatorNode->prependParameter(new NumberNode(coefficient));
+        operatorNode->prependParameter(new NumberNode(1 + coefficient));
       }
+    } else {
+      // Add a coefficient to the node if it does not already exist
+      operatorNode->prependParameter(parameter.op, new NumberNode(coefficient));
     }
   }
 

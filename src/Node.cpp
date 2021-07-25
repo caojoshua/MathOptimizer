@@ -93,7 +93,11 @@ bool OperatorNode::appendParameter(Op op, Node *node) {
 }
 
 void OperatorNode::prependParameter(Node *node) {
-  parameters.push_front(Parameter{getDefaultOp(), node});
+  prependParameter(getDefaultOp(), node);
+}
+
+void OperatorNode::prependParameter(Op op, Node *node) {
+  parameters.push_front(Parameter{op, node});
 }
 
 void OperatorNode::popFrontParameter() { parameters.pop_front(); }
