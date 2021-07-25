@@ -9,7 +9,7 @@ typedef std::list<Parameter> ParameterList;
 
 // Merges n's parameters with with child operator node parameters if the child
 // operator node has the same precendence as n
-void mergeWithChildren(OperatorNode *n) {
+Node *mergeWithChildren(OperatorNode *n) {
   std::list<Parameter> &parameters = n->getParameters();
   std::vector<Parameter> newParameters;
 
@@ -36,6 +36,8 @@ void mergeWithChildren(OperatorNode *n) {
   for (Parameter newParameter : newParameters) {
     n->appendParameter(newParameter);
   }
+
+  return n;
 }
 
 float foldFloatAndNumberNode(Op op, float number, NumberNode *numberNode) {
@@ -106,13 +108,8 @@ Node *foldConstants(OperatorNode *n) {
 // we compare terms to be added, so that we can linearly scan for equivalent
 // terms.
 // ie. x*y+y*x -> x*y->x*y
-void sortNodes(Node *n) {
-  OperatorNode *operatorNode = dynamic_cast<OperatorNode *>(n);
-  if (!n) {
-    return;
-  }
-
-  operatorNode->getParameters().sort([](Parameter a, Parameter b) {
+Node *sortNodes(OperatorNode *n) {
+  n->getParameters().sort([](Parameter a, Parameter b) {
     // We use an arbitrary sort comparison that can guarentee consistency using
     // the node's codegen. It is possible that two different types of nodes ie.
     // IdentiferNode 'x' and OperatorNode with single parameter 'x'
@@ -123,6 +120,8 @@ void sortNodes(Node *n) {
     // IdentifierNode strings can never be just a number.
     return a.op < b.op ? true : a.node->codeGen() < b.node->codeGen();
   });
+
+  return n;
 }
 
 NumberNode *getCoefficient(OperatorNode *n) {
@@ -191,15 +190,13 @@ bool sameVariableTerms(Node *_a, Node *_b) {
 }
 
 // Fold terms ie. 2*x + 3*x = 5*x
-Node *foldTerms(Node *n) {
-  OperatorNode *operatorNode = dynamic_cast<OperatorNode *>(n);
-  if (!operatorNode ||
-      operatorNode->getPrecedence() != OperatorNode::SumPrecedence) {
+Node *foldTerms(OperatorNode *n) {
+  if (n->getPrecedence() != OperatorNode::SumPrecedence) {
     return n;
   }
 
   std::list<Parameter> termCoefficients;
-  ParameterList &parameters = operatorNode->getParameters();
+  ParameterList &parameters = n->getParameters();
 
   for (Parameter parameter : parameters) {
     Node *childNode = parameter.node;
@@ -269,13 +266,8 @@ Node *foldTerms(Node *n) {
 // * x (+|-) 0 = x
 // * x (*|/) 1 = x
 // * x * 0 = 0
-Node *foldIdentities(Node *n) {
-  OperatorNode *operatorNode = dynamic_cast<OperatorNode *>(n);
-  if (!operatorNode) {
-    return n;
-  }
-
-  ParameterList &parameterList = operatorNode->getParameters();
+Node *foldIdentities(OperatorNode *n) {
+  ParameterList &parameterList = n->getParameters();
   auto iter = parameterList.begin();
 
   while (iter != parameterList.end()) {
@@ -302,12 +294,19 @@ Node *foldIdentities(Node *n) {
   return n;
 }
 
+const std::list<Node *(*)(OperatorNode *)> passes{
+    mergeWithChildren, sortNodes, foldConstants, foldTerms, foldIdentities,
+};
+
 Node *optimize(Node *n) {
   OperatorNode *operatorNode = dynamic_cast<OperatorNode *>(n);
+
+  // We cannot optimize on non OperatorNodes
   if (!operatorNode) {
     return n;
   }
 
+  // First optimize on child nodes
   ParameterList &parameters = operatorNode->getParameters();
   auto iter = parameters.begin();
   while (iter != parameters.end()) {
@@ -315,11 +314,14 @@ Node *optimize(Node *n) {
     ++iter;
   }
 
-  mergeWithChildren(operatorNode);
-  sortNodes(operatorNode);
-  n = foldConstants(operatorNode);
-  n = foldTerms(n);
-  n = foldIdentities(n);
+  // Pass the node into optimization passes in order
+  for (auto pass : passes) {
+    OperatorNode *operatorNode = dynamic_cast<OperatorNode *>(n);
+    if (!operatorNode) {
+      break;
+    }
+    n = pass(operatorNode);
+  }
 
   return n;
 }
