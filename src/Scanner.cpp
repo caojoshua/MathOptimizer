@@ -28,11 +28,23 @@ std::list<Token> scan(char *in) {
       break;
     }
     case '0' ... '9': {
-      float number = 0;
+      double number = 0;
       while (c >= '0' && c <= '9') {
         number = number * 10 + (c - '0');
         ++in;
         c = *in;
+      }
+      if (c == '.') {
+        // Scan decimal numbers
+        ++in;
+        c = *in;
+        float multiplier = 0.1;
+        while (c >= '0' && c <= '9') {
+          number = number + (c - '0') * multiplier;
+          ++in;
+          c = *in;
+          multiplier *= 0.1;
+        }
       }
       --in;
       tokens.push_back(Token(Token::Num, number));
@@ -60,6 +72,7 @@ std::list<Token> scan(char *in) {
       break;
     default:
       std::cerr << "fatal: unexpected character '" << c << "'" << std::endl;
+      exit(1);
     }
     ++in;
   }

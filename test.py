@@ -9,8 +9,16 @@ tests = [
         'output': '69'
     },
     {
-        'input': '-12345',
-        'output': '-12345'
+        'input': '69.',
+        'output': '69'
+    },
+    {
+        'input': '69.0',
+        'output': '69'
+    },
+    {
+        'input': '123.456',
+        'output': '123.456'
     },
     {
         'input': 'FooBar',
@@ -21,7 +29,7 @@ tests = [
         'output': '-1 * deadbeef'
     },
     {
-        'input': '2+3-4+5-6+7',
+        'input': '2+3-4.+5.0-6+7',
         'output': '7'
     },
     {
@@ -152,11 +160,10 @@ if __name__ == "__main__":
         cmd = [math_optimizer_bin, test['input']]
         try:
             output = subprocess.check_output(cmd)
-        except:
-            print('unable to run test: "' + str(cmd) + '"')
+        except Exception as e:
             failures.append({
                 'test': test,
-                'actual': 'error running the test'
+                'actual': 'Raised error: ' + str(e)
             })
             continue
         output = output.decode('utf-8').strip('\n')

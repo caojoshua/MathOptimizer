@@ -1,8 +1,8 @@
 E = Expression
 T = Term
 F = Factor
-V = Value
 N = Negated Value
+V = Value
 D = Decimal
 num = number (terminal)
 id = identifier (terminal)
@@ -10,6 +10,6 @@ id = identifier (terminal)
 E   ->  T + E | T - E | T
 T   ->  F * T | F / T | F
 F   ->  (E) | V
-V   ->  N | id
-N   ->  - D | D
-D   ->  num.num | num
+N   ->  - V | V
+V   ->  D | id
+D   ->  num | num. | num.num
