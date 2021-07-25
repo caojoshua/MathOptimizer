@@ -9,7 +9,7 @@ Some example simplifications:
 * simplifications with variables: `1+x+3` -> `x + 4
 * adding terms: `3*x*y + 2*y*x` -> `5 * x * y`
 
-See [#testing](#testing) for a more detailed list of features.
+See [#testing](#testing) for a more detailed list of features. See the [design](https://github.com/caojoshua/MathOptimizer/blob/main/DESIGN.md) for a description of the how MathOptimizer is built.
 
 ## Building
 
