@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 
   std::list<Token> tokens = scan(argv[1]);
 
-  Node *ast = TopDownParser::parse(tokens);
+  Node *ast = parse(tokens);
 
   ast = optimize(ast);
 
