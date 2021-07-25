@@ -248,6 +248,8 @@ Node *foldTerms(OperatorNode *n) {
     }
   }
 
+  delete n;
+
   // construct a new node with the terms added up
   OperatorNode *constructedOperatorNode =
       new OperatorNode(OperatorNode::SumPrecedence);
