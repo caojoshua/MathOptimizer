@@ -69,10 +69,7 @@ Node *foldConstants(OperatorNode *n) {
   while (iter != parameters.end()) {
     if (NumberNode *numberNode = dynamic_cast<NumberNode *>(iter->node)) {
       number = foldFloatAndNumberNode(iter->op, number, numberNode);
-      auto next = iter;
-      ++next;
-      parameters.erase(iter);
-      iter = next;
+      iter = parameters.erase(iter);
       delete numberNode;
       continue;
     }
