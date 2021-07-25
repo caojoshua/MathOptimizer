@@ -17,8 +17,8 @@ tests = [
         'output': '69'
     },
     {
-        'input': '123.456',
-        'output': '123.456'
+        'input': '12.345',
+        'output': '12.345'
     },
     {
         'input': 'FooBar',

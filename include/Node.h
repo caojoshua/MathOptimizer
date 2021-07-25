@@ -81,17 +81,17 @@ private:
 
 class NumberNode : public Node {
 public:
-  NumberNode(float number) : Node(), number(number) {}
+  NumberNode(double number) : Node(), number(number) {}
   bool operator==(Node *other);
   virtual Node *clone();
   std::string codeGen();
   std::string toString();
-  float getNumber();
-  void setNumber(float number);
+  double getNumber();
+  void setNumber(double number);
 
 private:
   static std::ostringstream ss;
-  float number;
+  double number;
 };
 
 #endif

@@ -3,7 +3,7 @@
 
 Token::Kind Token::getKind() { return this->kind; }
 
-float Token::getNumber() { return this->number; }
+double Token::getNumber() { return this->number; }
 
 std::string Token::getIdentifier() { return this->identifier; }
 

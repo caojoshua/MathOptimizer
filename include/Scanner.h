@@ -18,17 +18,17 @@ public:
   };
 
   Token(Kind kind) : kind(kind){};
-  Token(Kind kind, float number) : kind(kind), number(number){};
+  Token(Kind kind, double number) : kind(kind), number(number){};
   Token(Kind kind, std::string identifier)
       : kind(kind), identifier(identifier){};
   Kind getKind();
-  float getNumber();
+  double getNumber();
   std::string getIdentifier();
   bool isKind(Kind kind);
 
 private:
   Kind kind;
-  float number;
+  double number;
   std::string identifier;
 };
 

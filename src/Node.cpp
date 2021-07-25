@@ -205,12 +205,12 @@ Node *NumberNode::clone() { return new NumberNode(this->number); }
 
 std::string NumberNode::codeGen() {
   std::ostringstream ss;
-  ss << this->number;
+  ss <<  this->number;
   return std::string(ss.str());
 }
 
 std::string NumberNode::toString() { return this->codeGen(); }
 
-float NumberNode::getNumber() { return this->number; }
+double NumberNode::getNumber() { return this->number; }
 
-void NumberNode::setNumber(float number) { this->number = number; }
+void NumberNode::setNumber(double number) { this->number = number; }

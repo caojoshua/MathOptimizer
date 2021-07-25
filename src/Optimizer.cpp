@@ -42,8 +42,8 @@ Node *mergeWithChildren(OperatorNode *n) {
   return n;
 }
 
-float foldFloatAndNumberNode(Op op, float number, NumberNode *numberNode) {
-  float right = numberNode->getNumber();
+double foldFloatAndNumberNode(Op op, float number, NumberNode *numberNode) {
+  double right = numberNode->getNumber();
   switch (op) {
   case (OperatorNode::Add):
     return number + right;
@@ -63,7 +63,7 @@ float foldFloatAndNumberNode(Op op, float number, NumberNode *numberNode) {
 // assumption for later optimization passes
 Node *foldConstants(OperatorNode *n) {
   ParameterList &parameters = n->getParameters();
-  float number = n->getPrecedence() == OperatorNode::SumPrecedence ? 0 : 1;
+  double number = n->getPrecedence() == OperatorNode::SumPrecedence ? 0 : 1;
 
   auto iter = parameters.begin();
   while (iter != parameters.end()) {
@@ -235,7 +235,7 @@ Node *foldTerms(OperatorNode *n) {
     } else if (operatorNode) {
       NumberNode *numberNode = getCoefficient(operatorNode);
       if (numberNode) {
-        float number = existingCoefficient->op == OperatorNode::Sub
+        double number = existingCoefficient->op == OperatorNode::Sub
                            ? numberNode->getNumber() * -1
                            : numberNode->getNumber();
         numberNode->setNumber(number + coefficient);
@@ -271,7 +271,7 @@ Node *foldIdentities(OperatorNode *n) {
   while (iter != parameterList.end()) {
     NumberNode *numberNode = dynamic_cast<NumberNode *>(iter->node);
     if (numberNode) {
-      float number = numberNode->getNumber();
+      double number = numberNode->getNumber();
       if (number == 0) {
         if (iter->op == OperatorNode::Add || iter->op == OperatorNode::Sub) {
           delete iter->node;
