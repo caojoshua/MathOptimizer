@@ -30,15 +30,21 @@ bool isNextTokenKind(Tokens &tokens, Token::Kind kind) {
 }
 
 Node *parseValue(Tokens &tokens) {
-  Node *n = nullptr;
-
   if (isNextTokenKind(tokens, Token::Id)) {
-    n = new IdentifierNode(parseToken(tokens).getIdentifier());
-  } else {
-    n = new NumberNode(mustParseToken(tokens, Token::Num).getNumber());
+    return new IdentifierNode(parseToken(tokens).getIdentifier());
   }
+  return new NumberNode(mustParseToken(tokens, Token::Num).getNumber());
+}
 
-  return n;
+Node *parseNegatedValue(Tokens &tokens) {
+  if (isNextTokenKind(tokens, Token::Sub)) {
+    parseToken(tokens);
+    OperatorNode *n =
+        new OperatorNode(OperatorNode::ProductPrecedence, new NumberNode(-1));
+    n->appendParameter(OperatorNode::Mul, parseValue(tokens));
+    return n;
+  }
+  return parseValue(tokens);
 }
 
 Node *parseFactor(Tokens &tokens) {
@@ -49,7 +55,7 @@ Node *parseFactor(Tokens &tokens) {
     n = parseExpression(tokens);
     mustParseToken(tokens, Token::RightParen);
   } else {
-    n = parseValue(tokens);
+    n = parseNegatedValue(tokens);
   }
 
   return n;
