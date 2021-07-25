@@ -134,7 +134,11 @@ if __name__ == "__main__":
             output = subprocess.check_output(cmd)
         except:
             print('unable to run test: "' + str(cmd) + '"')
-            exit(1)
+            failures.append({
+                'test': test,
+                'actual': 'error running the test'
+            })
+            continue
         output = output.decode('utf-8').strip('\n')
         if (output == test['output']):
             passes.append(test)
