@@ -76,29 +76,12 @@ Node *foldConstants(OperatorNode *n) {
     }
     ++iter;
   }
+
   if (parameters.size() == 0) {
     delete n;
     return new NumberNode(number);
-  } else if ((n->getPrecedence() == OperatorNode::SumPrecedence &&
-              number != 0) ||
-             n->getPrecedence() == OperatorNode::ProductPrecedence &&
-                 number != 1) {
+  } else {
     n->prependParameter(new NumberNode(number));
-  }
-
-  // If there is only one parameter left, return the node for reflexive
-  // operators. For non-reflexive operators, prepend parameters to maintain
-  // correctness.
-  if (parameters.size() == 1) {
-    if (parameters.front().op == OperatorNode::Sub) {
-      n->prependParameter(new NumberNode(0));
-    } else if (parameters.front().op == OperatorNode::Div) {
-      n->prependParameter(new NumberNode(1));
-    } else {
-      Node *newNode = parameters.front().node->clone();
-      delete n;
-      return newNode;
-    }
   }
 
   return n;
