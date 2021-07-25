@@ -7,21 +7,8 @@ typedef OperatorNode::Op Op;
 typedef OperatorNode::Parameter Parameter;
 typedef std::list<Parameter> ParameterList;
 
-float foldFloatAndNumberNode(Op op, float number, NumberNode *numberNode) {
-  float right = numberNode->getNumber();
-  switch (op) {
-  case (OperatorNode::Add):
-    return number + right;
-  case (OperatorNode::Sub):
-    return number - right;
-  case (OperatorNode::Mul):
-    return number * right;
-  case (OperatorNode::Div):
-    return number / right;
-  }
-  return number;
-}
-
+// Merges n's parameters with with child operator node parameters if the child
+// operator node has the same precendence as n
 void mergeWithChildren(OperatorNode *n) {
   std::list<Parameter> &parameters = n->getParameters();
   std::vector<Parameter> newParameters;
@@ -51,6 +38,25 @@ void mergeWithChildren(OperatorNode *n) {
   }
 }
 
+float foldFloatAndNumberNode(Op op, float number, NumberNode *numberNode) {
+  float right = numberNode->getNumber();
+  switch (op) {
+  case (OperatorNode::Add):
+    return number + right;
+  case (OperatorNode::Sub):
+    return number - right;
+  case (OperatorNode::Mul):
+    return number * right;
+  case (OperatorNode::Div):
+    return number / right;
+  }
+  return number;
+}
+
+// Folds all constants in an operator node
+// ie. 2 + x + 3 = 5 + x
+// We always leave the constant as the left-most parameter, which is used as an
+// assumption for later optimization passes
 Node *foldConstants(OperatorNode *n) {
   ParameterList &parameters = n->getParameters();
   float number = n->getPrecedence() == OperatorNode::SumPrecedence ? 0 : 1;
@@ -109,8 +115,7 @@ void sortNodes(Node *n) {
   operatorNode->getParameters().sort([](Parameter a, Parameter b) {
     // We use an arbitrary sort comparison that can guarentee consistency using
     // the node's codegen. It is possible that two different types of nodes ie.
-    // IdentiferNode 'x'
-    // OperatorNode with single parameter 'x'
+    // IdentiferNode 'x' and OperatorNode with single parameter 'x'
     // In which case its possible the nodes can inconsistently show on the left
     // or right of each other. But in practice, OpertorNodes would with a single
     // parameter would have already been extracted into a single leaf node.
@@ -145,6 +150,8 @@ OperatorNode *nodeAsOperatorNode(OperatorNode::Precedence precedence, Node *n) {
   return dynamic_cast<OperatorNode *>(n);
 }
 
+// Checks if _a and _b have the same variable terms
+// ie. sameVariableTerms(2*x*(y+z), 3*(y+z)*x) = true
 bool sameVariableTerms(Node *_a, Node *_b) {
   OperatorNode *a = nodeAsOperatorNode(OperatorNode::ProductPrecedence, _a);
   OperatorNode *b = nodeAsOperatorNode(OperatorNode::ProductPrecedence, _b);
