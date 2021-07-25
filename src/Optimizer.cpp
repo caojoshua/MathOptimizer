@@ -275,14 +275,17 @@ Node *foldIdentities(OperatorNode *n) {
       float number = numberNode->getNumber();
       if (number == 0) {
         if (iter->op == OperatorNode::Add || iter->op == OperatorNode::Sub) {
+          delete iter->node;
           iter = parameterList.erase(iter);
           continue;
         } else if (iter->op == OperatorNode::Mul) {
+          delete n;
           return new NumberNode(0);
         }
       } else if ((iter->op == OperatorNode::Mul ||
                   iter->op == OperatorNode::Div) &&
                  number == 1) {
+        delete iter->node;
         iter = parameterList.erase(iter);
         continue;
       }
