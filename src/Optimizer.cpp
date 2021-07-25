@@ -261,6 +261,43 @@ Node *foldTerms(Node *n) {
   return constructedOperatorNode;
 }
 
+// Fold identity rules
+// * x (+|-) 0 = x
+// * x (*|/) 1 = x
+// * x * 0 = 0
+Node *foldIdentities(Node *n) {
+  OperatorNode *operatorNode = dynamic_cast<OperatorNode *>(n);
+  if (!operatorNode) {
+    return n;
+  }
+
+  ParameterList &parameterList = operatorNode->getParameters();
+  auto iter = parameterList.begin();
+
+  while (iter != parameterList.end()) {
+    NumberNode *numberNode = dynamic_cast<NumberNode *>(iter->node);
+    if (numberNode) {
+      float number = numberNode->getNumber();
+      if (number == 0) {
+        if (iter->op == OperatorNode::Add || iter->op == OperatorNode::Sub) {
+          iter = parameterList.erase(iter);
+          continue;
+        } else if (iter->op == OperatorNode::Mul) {
+          return new NumberNode(0);
+        }
+      } else if ((iter->op == OperatorNode::Mul ||
+                  iter->op == OperatorNode::Div) &&
+                 number == 1) {
+        iter = parameterList.erase(iter);
+        continue;
+      }
+    }
+    ++iter;
+  }
+
+  return n;
+}
+
 Node *optimize(Node *n) {
   OperatorNode *operatorNode = dynamic_cast<OperatorNode *>(n);
   if (!operatorNode) {
@@ -278,6 +315,7 @@ Node *optimize(Node *n) {
   sortNodes(operatorNode);
   n = foldConstants(operatorNode);
   n = foldTerms(n);
+  n = foldIdentities(n);
 
   return n;
 }

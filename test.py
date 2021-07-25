@@ -25,6 +25,26 @@ tests = [
         'output': '0.2',
     },
     {
+        'input': 'a+b+0+c+d',
+        'output': 'a + b + c + d',
+    },
+    {
+        'input': 'a+(b+0)+c+d',
+        'output': 'a + b + c + d',
+    },
+    {
+        'input': 'a*b*0*(c+d)*e',
+        'output': '0',
+    },
+    {
+        'input': 'a*(b*0)*(c+d)*e+z',
+        'output': 'z',
+    },
+    {
+        'input': 'a*1+b/1',
+        'output': 'a + b',
+    },
+    {
         'input': '(2+3-4)*6/5',
         'output': '1.2',
     },
