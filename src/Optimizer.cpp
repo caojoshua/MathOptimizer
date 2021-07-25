@@ -25,9 +25,11 @@ Node *mergeWithChildren(OperatorNode *n) {
             parameter.op == OperatorNode::Div) {
           newParameter.op = OperatorNode::getOppositeOp(newParameter.op);
         }
-        newParameters.push_back(newParameter);
+        newParameters.push_back(
+            Parameter{newParameter.op, newParameter.node->clone()});
       }
       iter = parameters.erase(iter);
+      delete childOperatorNode;
       continue;
     }
     ++iter;
@@ -124,12 +126,20 @@ NumberNode *getCoefficient(Node *n) {
   return getCoefficient(operatorNode);
 }
 
+// Helper function to return an identifier node as a single parameter in an
+// operator node, or the operator node itself. Number nodes are return as
+// nullptr.
 OperatorNode *nodeAsOperatorNode(OperatorNode::Precedence precedence, Node *n) {
   IdentifierNode *identifierNode = dynamic_cast<IdentifierNode *>(n);
   if (identifierNode) {
-    return new OperatorNode(precedence, identifierNode);
+    return new OperatorNode(precedence, identifierNode->clone());
   }
-  return dynamic_cast<OperatorNode *>(n);
+  Node *clone = n->clone();
+  OperatorNode *operatorNode = dynamic_cast<OperatorNode *>(clone);
+  if (!operatorNode) {
+    delete clone;
+  }
+  return operatorNode;
 }
 
 // Checks if _a and _b have the same variable terms
@@ -139,6 +149,8 @@ bool sameVariableTerms(Node *_a, Node *_b) {
   OperatorNode *b = nodeAsOperatorNode(OperatorNode::ProductPrecedence, _b);
 
   if (!a || !b) {
+    delete a;
+    delete b;
     return false;
   }
 
@@ -162,6 +174,8 @@ bool sameVariableTerms(Node *_a, Node *_b) {
     }
 
     if (aIter->op != bIter->op || *(aIter->node) != bIter->node) {
+      delete a;
+      delete b;
       return false;
     }
 
@@ -169,6 +183,8 @@ bool sameVariableTerms(Node *_a, Node *_b) {
     ++bIter;
   }
 
+  delete a;
+  delete b;
   return aIter == aParams.cend() && bIter == bParams.cend();
 }
 
